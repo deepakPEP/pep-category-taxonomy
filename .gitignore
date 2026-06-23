@@ -1,0 +1,46 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Environment — never commit secrets
+.env
+
+# Pipeline outputs — too large for git
+output/phase1/
+output/phase2/
+output/phase3/
+output/phase4/
+output/phase5/
+output/logs/
+output/metrics/
+output/state/
+
+# Preserve folder structure in git
+!output/.gitkeep
+!output/phase1/.gitkeep
+!output/phase2/.gitkeep
+!output/phase3/.gitkeep
+!output/phase4/.gitkeep
+!output/phase5/.gitkeep
+!output/logs/.gitkeep
+!output/metrics/.gitkeep
+!output/state/.gitkeep
+
+# Input CSV — large data files stay local
+input/*.csv
+!input/.gitkeep
+
+# macOS
+.DS_Store
+
+# ML artifacts
+*.bin
+*.onnx
+*.pt
+*.safetensors
