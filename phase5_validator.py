@@ -13,7 +13,7 @@ NON_SOFTWARE_CATEGORIES = {
     "Apparel & Fashion",
     "Agriculture & Food Products",
     "Machinery & Equipment",
-    "Chemicals",
+    "Chemicals & Raw Materials",
     "Electrical & Electronics",
     "Construction & Infrastructure",
     "Health & Personal Care",
@@ -22,9 +22,9 @@ NON_SOFTWARE_CATEGORIES = {
     "Tools & Hardware",
     "Packaging & Printing",
     "Office Supplies & Equipment",
+    "Sports & Entertainment",
 }
 
-# Genuine software keywords — standalone word match only
 SOFTWARE_KEYWORDS = [
     'software', 'erp', 'crm', 'saas',
     'management system', 'tracking system',
@@ -33,7 +33,6 @@ SOFTWARE_KEYWORDS = [
     'management platform', 'analytics platform',
 ]
 
-# Physical products that contain software-like words but are NOT software
 PHYSICAL_PRODUCT_WHITELIST = [
     'platform bed', 'platform beds',
     'platform scale', 'platform scales',
@@ -46,39 +45,25 @@ PHYSICAL_PRODUCT_WHITELIST = [
     'dashboard organizer', 'dashboard organizers',
     'dashboard polish', 'dashboard cleaner',
     'dashboard lighting', 'dashboard component',
-    'dashboard components',
-    'dashboard & instrument',
-    'app control',
-    'app sync',
+    'dashboard components', 'dashboard & instrument',
     'smart bulb', 'smart bulbs',
     'smart thermometer', 'smart thermometers',
-    'alarm system',
-    'building management system',
-    'grout filling',
-    'sealant application',
-    'organic dye',
-    'home lift', 'home lifts',
-    'mobile app monitoring',
-    'music production',
-    'ott platform',
-    'fleet tracking',
-    'fleet software',
+    'alarm system', 'building management system',
+    'grout filling', 'sealant application',
+    'organic dye', 'home lift', 'home lifts',
+    'mobile app monitoring', 'music production',
+    'ott platform', 'fleet tracking', 'fleet software',
 ]
 
 def is_software(name: str) -> bool:
     lower = name.lower().strip()
-
-    # Check whitelist first — if it's a physical product, skip
     for physical in PHYSICAL_PRODUCT_WHITELIST:
         if physical in lower:
             return False
-
-    # Check for genuine software keywords
     padded = f" {lower} "
     for kw in SOFTWARE_KEYWORDS:
         if f" {kw} " in padded or padded.strip().endswith(kw):
             return True
-
     return False
 
 def run():
@@ -102,16 +87,20 @@ def run():
     df = df.drop_duplicates()
     logger.info(f"Exact duplicates removed: {before - len(df)}")
 
-    # 2. Resolve same product_category under multiple subcategories
+    # 2. Resolve same product under multiple subcategories (within category)
     before = len(df)
     df['sub_len'] = df['subcategory'].str.len()
     df = df.sort_values('sub_len', ascending=False)
     df = df.drop_duplicates(subset=['category', 'product_category'], keep='first')
     df = df.drop(columns=['sub_len'])
-    cross_dupes = before - len(df)
-    logger.info(f"Cross-subcategory duplicates resolved: {cross_dupes}")
+    logger.info(f"Cross-subcategory duplicates resolved: {before - len(df)}")
 
-    # 3. Detect remaining multi-subcategory products (log only — do not auto move)
+    # 3. Resolve same product across multiple categories
+    before = len(df)
+    df = df.drop_duplicates(subset=['product_category'], keep='first')
+    logger.info(f"Cross-category duplicates resolved: {before - len(df)}")
+
+    # 4. Detect remaining multi-subcategory products
     multi_sub = df.groupby('product_category')['subcategory'].nunique()
     multi_sub_products = multi_sub[multi_sub > 1].index.tolist()
     if multi_sub_products:
@@ -119,7 +108,7 @@ def run():
         for p in multi_sub_products[:20]:
             issues.append(f"MULTI_SUBCATEGORY: {p}")
 
-    # 4. Detect genuinely misplaced software
+    # 5. Detect misplaced software
     misplaced_mask = df.apply(
         lambda row: (
             row['category'] in NON_SOFTWARE_CATEGORIES and
@@ -131,37 +120,36 @@ def run():
     if not misplaced.empty:
         logger.warning(f"Misplaced software products: {len(misplaced)}")
         for _, row in misplaced.iterrows():
-            issues.append(
-                f"MISPLACED_SOFTWARE: '{row['product_category']}' "
-                f"under '{row['category']}'"
-            )
+            issues.append(f"MISPLACED_SOFTWARE: '{row['product_category']}' under '{row['category']}'")
         df.loc[misplaced_mask, 'category'] = 'Software & IT Solutions'
         logger.info(f"Auto-corrected {len(misplaced)} misplaced software products.")
     else:
         logger.info("No misplaced software products detected.")
 
-    # 5. Drop empty rows
+    # 6. Drop empty rows
     df = df.dropna(subset=['category', 'subcategory', 'product_category'])
     df = df[df['product_category'].str.strip() != '']
 
-    # 6. Sort
-    df = df.sort_values(
-        ['category', 'subcategory', 'product_category']
-    ).reset_index(drop=True)
+    # 7. Sort
+    df = df.sort_values(['category', 'subcategory', 'product_category']).reset_index(drop=True)
 
     final_count = len(df)
+    sub_count = df['subcategory'].nunique()
     set_metric('final_products', final_count)
+    set_metric('final_subcategories', sub_count)
+    set_metric('final_categories', df['category'].nunique())
     set_metric('validation_issues', len(issues))
 
     output_path = os.path.join(PHASE5_OUTPUT_DIR, 'final_taxonomy.csv')
     df.to_csv(output_path, index=False, encoding='utf-8')
-    logger.info(f"Final taxonomy written: {output_path} ({final_count} rows)")
+    logger.info(f"Final taxonomy: {output_path} ({final_count} rows, {sub_count} subcategories)")
+    logger.info(f"\nCategory distribution:\n{df['category'].value_counts().to_string()}")
 
     if issues:
         issues_path = os.path.join(PHASE5_OUTPUT_DIR, 'validation_issues.txt')
         with open(issues_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(issues))
-        logger.warning(f"Validation issues: {len(issues)} logged")
+        logger.warning(f"Validation issues logged: {len(issues)}")
     else:
         logger.info("No validation issues found.")
 

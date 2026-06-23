@@ -7,16 +7,17 @@ from common.checkpoint import is_completed, mark_completed
 logger = get_logger("phase2b")
 
 # ============================================================
-# CANONICAL 14 CATEGORIES — only these are allowed
+# CANONICAL 15 CATEGORIES
 # ============================================================
 CANONICAL_CATEGORIES = {
     "apparel & fashion": "Apparel & Fashion",
     "agriculture & food products": "Agriculture & Food Products",
     "food & agriculture": "Agriculture & Food Products",
     "automotive & transport": "Automotive & Transport",
-    "chemicals": "Chemicals",
-    "raw materials & chemicals": "Chemicals",
-    "industrial gases": "Chemicals",
+    "chemicals": "Chemicals & Raw Materials",
+    "chemicals & raw materials": "Chemicals & Raw Materials",
+    "raw materials & chemicals": "Chemicals & Raw Materials",
+    "industrial gases": "Chemicals & Raw Materials",
     "construction & infrastructure": "Construction & Infrastructure",
     "construction": "Construction & Infrastructure",
     "construction materials": "Construction & Infrastructure",
@@ -37,16 +38,31 @@ CANONICAL_CATEGORIES = {
     "professional services": "Services & Support",
     "software & it solutions": "Software & IT Solutions",
     "software & its solutions": "Software & IT Solutions",
+    "sports & entertainment": "Sports & Entertainment",
     "tools & hardware": "Tools & Hardware",
     "textiles & fabrics": "Apparel & Fashion",
     "textile raw materials": "Apparel & Fashion",
-    "sports & entertainment": "Home & Lifestyle",
     "education & training": "Services & Support",
     "education": "Services & Support",
 }
 
 # ============================================================
-# BUSINESS ENTITY KEYWORDS — subcategories to reassign
+# SPORTS PRODUCT KEYWORDS — reassign to Sports & Entertainment
+# ============================================================
+SPORTS_KEYWORDS = [
+    'gym', 'fitness', 'sport', 'sports', 'exercise', 'workout',
+    'yoga', 'cricket', 'football', 'basketball', 'tennis', 'badminton',
+    'swimming', 'cycling', 'treadmill', 'dumbbell', 'barbell',
+    'kettlebell', 'resistance band', 'boxing', 'martial arts',
+    'outdoor game', 'playground', 'trampoline', 'skateboard',
+    'musical instrument', 'guitar', 'drums', 'keyboard instrument',
+    'trophy', 'medal', 'scoreboard', 'stadium', 'sports flooring',
+    'camping', 'hiking', 'trekking', 'fishing', 'hunting',
+    'billiards', 'chess', 'board game', 'playing cards',
+]
+
+# ============================================================
+# BUSINESS ENTITY KEYWORDS
 # ============================================================
 BUSINESS_ENTITY_KEYWORDS = [
     'manufacturer', 'manufacturers', 'exporter', 'exporters',
@@ -59,7 +75,7 @@ BUSINESS_ENTITY_KEYWORDS = [
 ]
 
 # ============================================================
-# EXPLICIT SUBCATEGORY REMAPS
+# SUBCATEGORY REMAPS
 # ============================================================
 SUBCATEGORY_REMAP = {
     "Garment Manufacturers (OEM/ODM)": "Men's Wear",
@@ -86,7 +102,6 @@ SUBCATEGORY_REMAP = {
     "Fabric Printing & Dyeing Units": "Fabric Dyeing & Printing",
     "Fashion Design Studios": "Fashion Design",
     "Model Agencies & Styling Services": "Fashion Services",
-    "Custom Design Bag & Footwear Services": "Bags & Footwear",
     "Synthetic Footwear Manufacturers": "Footwear",
     "OEM Parts Suppliers": "Spare Parts",
     "OEM Manufacturers": "Industrial Equipment",
@@ -98,20 +113,16 @@ SUBCATEGORY_REMAP = {
     "Commercial Vehicle Dealers & Distributors": "Commercial Vehicles",
     "Commercial Vehicle Importers & Exporters": "Commercial Vehicles",
     "Commercial Vehicle OEMs": "Commercial Vehicles",
-    "OEM Vehicle Leasing Partners": "Vehicle Leasing",
     "Block Making Machine Manufacturers": "Concrete & Block Making Machinery",
     "Cement Dealers & Distributors": "Cement & Concrete Products",
     "Ready Mix Concrete Suppliers": "Cement & Concrete Products",
 }
 
-# ============================================================
-# CATEGORY FALLBACK SUBCATEGORIES
-# ============================================================
 CATEGORY_FALLBACK_SUBCATEGORY = {
     "Apparel & Fashion": "Apparel Accessories",
     "Agriculture & Food Products": "Agricultural Produce",
     "Machinery & Equipment": "Industrial Equipment",
-    "Chemicals": "Industrial Chemicals",
+    "Chemicals & Raw Materials": "Industrial Chemicals",
     "Automotive & Transport": "Auto Parts & Accessories",
     "Construction & Infrastructure": "Construction Materials",
     "Electrical & Electronics": "Electronic Components",
@@ -122,6 +133,7 @@ CATEGORY_FALLBACK_SUBCATEGORY = {
     "Software & IT Solutions": "Business Software",
     "Office Supplies & Equipment": "Office Accessories",
     "Services & Support": "Business Services",
+    "Sports & Entertainment": "Sports Equipment",
 }
 
 def is_business_entity(name: str) -> bool:
@@ -129,8 +141,20 @@ def is_business_entity(name: str) -> bool:
     return any(f" {kw}" in f" {lower}" or lower.startswith(kw)
                for kw in BUSINESS_ENTITY_KEYWORDS)
 
-def fix_category(cat: str) -> str:
-    return CANONICAL_CATEGORIES.get(cat.lower().strip(), cat.strip())
+def is_sports_product(name: str) -> bool:
+    lower = name.lower()
+    return any(kw in lower for kw in SPORTS_KEYWORDS)
+
+def fix_category(row) -> str:
+    cat = str(row['category']).strip()
+    canonical = CANONICAL_CATEGORIES.get(cat.lower(), cat)
+
+    # Reassign sports products that ended up in wrong categories
+    if canonical in ('Home & Lifestyle', 'Machinery & Equipment', 'Electrical & Electronics'):
+        if is_sports_product(str(row['product_category'])):
+            return 'Sports & Entertainment'
+
+    return canonical
 
 def fix_subcategory(row) -> str:
     sub = str(row['subcategory']).strip()
@@ -160,6 +184,49 @@ def fix_product_category(name: str) -> str:
         result = result.replace(old, new)
     return result.strip()
 
+def collapse_single_product_subcategories(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Subcategories with only 1 product are too granular.
+    Collapse them by assigning product to a broader sibling subcategory
+    within the same category, or use the category fallback.
+    """
+    sub_counts = df.groupby(['category', 'subcategory']).size().reset_index(name='count')
+    single_subs = sub_counts[sub_counts['count'] == 1]
+
+    if single_subs.empty:
+        return df
+
+    logger.info(f"Collapsing {len(single_subs)} single-product subcategories")
+
+    # For each single-product subcategory, find the most common sibling
+    # subcategory in same category and reassign
+    for _, row in single_subs.iterrows():
+        cat = row['category']
+        sub = row['subcategory']
+
+        # Find other subcategories in same category with multiple products
+        siblings = df[
+            (df['category'] == cat) &
+            (df['subcategory'] != sub)
+        ]['subcategory'].value_counts()
+
+        if not siblings.empty:
+            # Assign to most populated sibling
+            best_sibling = siblings.index[0]
+            df.loc[
+                (df['category'] == cat) & (df['subcategory'] == sub),
+                'subcategory'
+            ] = best_sibling
+        else:
+            # Use fallback
+            fallback = CATEGORY_FALLBACK_SUBCATEGORY.get(cat, "General Products")
+            df.loc[
+                (df['category'] == cat) & (df['subcategory'] == sub),
+                'subcategory'
+            ] = fallback
+
+    return df
+
 def run():
     if is_completed("phase2b"):
         return
@@ -174,26 +241,26 @@ def run():
     initial = len(df)
     logger.info(f"Input rows: {initial}")
 
-    # Step 1 — Consolidate 32 categories → 14
-    df['category'] = df['category'].apply(fix_category)
+    # Step 1 — Consolidate categories to 15 canonical
+    df['category'] = df.apply(fix_category, axis=1)
     cats_after = df['category'].nunique()
-    logger.info(f"Step 1: Categories consolidated → {cats_after} unique categories")
+    sports_count = len(df[df['category'] == 'Sports & Entertainment'])
+    logger.info(f"Step 1: {cats_after} categories | Sports & Entertainment: {sports_count} products")
 
     # Step 2 — Fix business entity subcategories
     df['subcategory'] = df.apply(fix_subcategory, axis=1)
     logger.info("Step 2: Business entity subcategories remapped")
 
-    # Step 3 — Clean business language from product category names
+    # Step 3 — Clean business language from product names
     df['product_category'] = df['product_category'].apply(fix_product_category)
-    logger.info("Step 3: Business language removed from product category names")
+    logger.info("Step 3: Business language removed from product names")
 
     # Step 4 — Remove exact duplicates
     before = len(df)
     df = df.drop_duplicates(subset=['category', 'subcategory', 'product_category'])
     logger.info(f"Step 4: Exact duplicates removed: {before - len(df)}")
 
-    # Step 5 — Resolve product appearing in multiple subcategories
-    # Keep most specific subcategory (longest name)
+    # Step 5 — Resolve product in multiple subcategories within same category
     before = len(df)
     df['sub_len'] = df['subcategory'].str.len()
     df = df.sort_values('sub_len', ascending=False)
@@ -201,23 +268,33 @@ def run():
     df = df.drop(columns=['sub_len'])
     logger.info(f"Step 5: Cross-subcategory duplicates resolved: {before - len(df)}")
 
-    # Step 6 — Drop empty rows
+    # Step 6 — Resolve product appearing in multiple categories
+    before = len(df)
+    df = df.drop_duplicates(subset=['product_category'], keep='first')
+    logger.info(f"Step 6: Cross-category duplicates resolved: {before - len(df)}")
+
+    # Step 7 — Collapse single-product subcategories
+    df = collapse_single_product_subcategories(df)
+    logger.info("Step 7: Single-product subcategories collapsed")
+
+    # Step 8 — Drop empty rows
     df = df.dropna(subset=['category', 'subcategory', 'product_category'])
     df = df[df['product_category'].str.strip() != '']
 
-    # Step 7 — Sort
+    # Step 9 — Sort
     df = df.sort_values(
         ['category', 'subcategory', 'product_category']
     ).reset_index(drop=True)
 
     final = len(df)
-    logger.info(f"Phase 2B complete: {initial} → {final} rows ({initial - final} total removed)")
+    sub_count = df['subcategory'].nunique()
+    logger.info(f"Phase 2B complete: {initial} → {final} rows")
+    logger.info(f"Final subcategory count: {sub_count}")
+    logger.info(f"Category distribution:\n{df['category'].value_counts().to_string()}")
 
-    # Overwrite merged_reorganized.csv — Phase 3 reads this file
     df.to_csv(input_path, index=False, encoding='utf-8')
     logger.info(f"Clean taxonomy written to {input_path}")
 
-    # Save reference copy
     corrected_path = os.path.join(PHASE2_OUTPUT_DIR, "corrected_taxonomy.csv")
     df.to_csv(corrected_path, index=False, encoding='utf-8')
     logger.info(f"Reference copy saved to {corrected_path}")
