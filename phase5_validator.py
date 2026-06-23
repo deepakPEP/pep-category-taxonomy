@@ -53,6 +53,7 @@ PHYSICAL_PRODUCT_WHITELIST = [
     'organic dye', 'home lift', 'home lifts',
     'mobile app monitoring', 'music production',
     'ott platform', 'fleet tracking', 'fleet software',
+    'automation system installation',
 ]
 
 def is_software(name: str) -> bool:
