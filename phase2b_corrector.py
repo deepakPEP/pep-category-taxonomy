@@ -7,7 +7,7 @@ from common.checkpoint import is_completed, mark_completed
 logger = get_logger("phase2b")
 
 # ============================================================
-# CANONICAL 15 CATEGORIES
+# CANONICAL 16 CATEGORIES
 # ============================================================
 CANONICAL_CATEGORIES = {
     "apparel & fashion": "Apparel & Fashion",
@@ -44,14 +44,90 @@ CANONICAL_CATEGORIES = {
     "textile raw materials": "Apparel & Fashion",
     "education & training": "Services & Support",
     "education": "Services & Support",
+    "energy & power": "Energy & Power",
+    "energy": "Energy & Power",
+    "renewable energy": "Energy & Power",
 }
 
 # ============================================================
-# P0 FIX: SUBCATEGORY → CORRECT CATEGORY REMAP
-# Every subcategory that belongs in a different category
+# SOFTWARE SUBCATEGORY CANONICAL MAP
+# Maps any software-related subcategory to correct type-based name
+# These are PRODUCT subcategories — licensed software products only
+# ============================================================
+SOFTWARE_SUBCATEGORY_MAP = {
+    # ERP & Business Management
+    "Apparel Management Software": "ERP & Business Management Software",
+    "Fashion Retail POS Systems": "ERP & Business Management Software",
+    "Enterprise Resource Planning (ERP)": "ERP & Business Management Software",
+    "Product Lifecycle Management (PLM)": "ERP & Business Management Software",
+    "Quality Management Software": "ERP & Business Management Software",
+    "Quality Control Software": "ERP & Business Management Software",
+    "Compliance Management Software": "ERP & Business Management Software",
+    "Facility Management Software": "ERP & Business Management Software",
+    "Inventory Management Software": "ERP & Business Management Software",
+    "Project Management Software": "ERP & Business Management Software",
+    "Business Management Software": "ERP & Business Management Software",
+    "Workflow Automation Software": "ERP & Business Management Software",
+    "Manufacturing Execution Systems (MES)": "ERP & Business Management Software",
+    "Retail Point of Sale (POS) Software": "ERP & Business Management Software",
+
+    # CRM & Sales Automation
+    "CRM & Sales Automation": "CRM & Sales Automation Software",
+
+    # HR & Payroll
+    "HR & Payroll Software": "HR & Payroll Software",
+
+    # Healthcare IT
+    "Healthcare IT Solutions": "Healthcare IT Software",
+    "Mental Health & Wellness Software": "Healthcare IT Software",
+    "Digital Health & Wellness Software": "Healthcare IT Software",
+    "Telehealth Devices & Software": "Healthcare IT Software",
+
+    # Industry-Specific
+    "Fleet Management Software": "Industry-Specific Software",
+    "Agriculture Software": "Industry-Specific Software",
+    "Industrial Automation Software": "Industry-Specific Software",
+    "Industrial Software": "Industry-Specific Software",
+    "Industrial Control Systems": "Industry-Specific Software",
+    "EV Software & Platforms": "Industry-Specific Software",
+    "Simulation & Modeling Software": "Industry-Specific Software",
+    "Electronic Design Automation (EDA)": "Industry-Specific Software",
+    "3D Printing Software": "Industry-Specific Software",
+    "Engineering & Design Software": "Industry-Specific Software",
+    "STEM Software": "Industry-Specific Software",
+
+    # Cloud & Productivity
+    "Data Backup & Disaster Recovery": "Cloud & Productivity Software",
+    "Cloud & Productivity Software": "Cloud & Productivity Software",
+    "Custom Software Development": "Cloud & Productivity Software",
+
+    # IoT & Smart Building
+    "Building Management Systems": "IoT & Smart Building Software",
+    "Energy Management Systems": "IoT & Smart Building Software",
+
+    # Educational
+    "Educational Software": "Educational & eLearning Software",
+
+    # Cybersecurity
+    "Cybersecurity Software": "Cybersecurity Software",
+
+    # Game Development
+    "Game Development Software": "Creative & Game Development Software",
+    "AR/VR Development Software": "Creative & Game Development Software",
+
+    # SERVICES that were wrongly in Software — move to Services & Support
+    # These will be handled by SUBCATEGORY_CATEGORY_REMAP below
+    "Digital Marketing Services": None,  # → Services & Support
+    "Mobile App Development": None,       # → Services & Support
+    "Translation & Localization Services": None,  # → Services & Support
+    "Digital Imaging Services": None,     # → Services & Support
+}
+
+# ============================================================
+# SUBCATEGORY → CORRECT CATEGORY REMAP
 # ============================================================
 SUBCATEGORY_CATEGORY_REMAP = {
-    # Agriculture wrongly placed subcategories
+    # Agriculture wrongly placed
     "Leather & Hides": "Apparel & Fashion",
     "Textile Raw Materials": "Apparel & Fashion",
     "Recycled Apparel": "Apparel & Fashion",
@@ -61,7 +137,7 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Processed Wood": "Construction & Infrastructure",
     "Biodegradable & Sustainable Raw Materials": "Chemicals & Raw Materials",
 
-    # Electrical & Electronics wrongly placed subcategories
+    # Electrical wrongly placed
     "Tiles, Marble, Granite & Flooring": "Construction & Infrastructure",
     "Sunglasses & Eyewear": "Apparel & Fashion",
     "Office Telephones & Intercom Systems": "Office Supplies & Equipment",
@@ -74,7 +150,7 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Vehicle Electrical Systems": "Automotive & Transport",
     "Aquaculture & Fisheries Equipment": "Machinery & Equipment",
 
-    # Home & Lifestyle — sports products wrongly placed
+    # Home & Lifestyle — sports wrongly placed
     "Water Sports Equipment (Swimming, Surfing, Diving)": "Sports & Entertainment",
     "Martial Arts & Boxing Equipment": "Sports & Entertainment",
     "Cycling Gear & Accessories": "Sports & Entertainment",
@@ -107,7 +183,7 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Badminton Equipment": "Sports & Entertainment",
     "Children's Play Equipment & Toys": "Sports & Entertainment",
 
-    # Machinery wrongly placed subcategories
+    # Machinery wrongly placed
     "Electronic Toys & Educational Toys": "Home & Lifestyle",
     "Gaming Consoles & Accessories": "Electrical & Electronics",
     "Baby Furniture": "Home & Lifestyle",
@@ -121,7 +197,7 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Garment Accessories & Trims": "Apparel & Fashion",
     "Three-Wheelers": "Automotive & Transport",
 
-    # Chemicals wrongly placed subcategories
+    # Chemicals wrongly placed
     "Food Additives & Preservatives": "Agriculture & Food Products",
     "Food Additives & Ingredients": "Agriculture & Food Products",
     "Agrochemicals": "Agriculture & Food Products",
@@ -130,20 +206,27 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Organic Pesticides": "Agriculture & Food Products",
     "Fertilizers & Soil Conditioners": "Agriculture & Food Products",
 
-    # Construction wrongly placed subcategories
+    # Construction wrongly placed
     "Workshop Equipment": "Tools & Hardware",
     "Tool Room Equipment": "Tools & Hardware",
 
-    # Sports wrongly placed subcategories
+    # Sports wrongly placed
     "Recycling Machinery": "Machinery & Equipment",
     "Consumer Electronics": "Electrical & Electronics",
 
-    # Software wrongly placed subcategories
+    # Software — services that don't belong in Software & IT Solutions
+    "Digital Marketing Services": "Services & Support",
+    "Mobile App Development": "Services & Support",
+    "Translation & Localization Services": "Services & Support",
+    "Digital Imaging Services": "Services & Support",
+    "AR/VR Development Services": "Services & Support",
+
+    # Software — hardware/physical that doesn't belong in Software
     "Barcode Labels & RFID Tags": "Packaging & Printing",
     "Control Panels & PLCs": "Electrical & Electronics",
     "Cold Chain Logistics & Storage": "Agriculture & Food Products",
 
-    # Health wrongly placed subcategories
+    # Health wrongly placed
     "Restroom Furniture": "Office Supplies & Equipment",
 
     # Automotive duplicates
@@ -155,9 +238,97 @@ SUBCATEGORY_CATEGORY_REMAP = {
     "Lighting & Signaling Devices": "Automotive & Transport",
 }
 
+# When a subcategory moves to a new category, what subcategory does it use?
+SUBCATEGORY_REMAP_TARGET = {
+    ("Leather & Hides", "Apparel & Fashion"): "Leather Materials",
+    ("Textile Raw Materials", "Apparel & Fashion"): "Fabrics",
+    ("Recycled Apparel", "Apparel & Fashion"): "Sustainable Apparel",
+    ("Fashion Design Services", "Services & Support"): "Graphic Design & Branding",
+    ("Timber & Logs", "Construction & Infrastructure"): "Wood & Plywood Products",
+    ("Wood & Wood Products", "Construction & Infrastructure"): "Wood & Plywood Products",
+    ("Processed Wood", "Construction & Infrastructure"): "Wood & Plywood Products",
+    ("Biodegradable & Sustainable Raw Materials", "Chemicals & Raw Materials"): "Biodegradable & Sustainable Raw Materials",
+    ("Tiles, Marble, Granite & Flooring", "Construction & Infrastructure"): "Tiles, Marble, Granite & Flooring",
+    ("Sunglasses & Eyewear", "Apparel & Fashion"): "Accessories",
+    ("Office Telephones & Intercom Systems", "Office Supplies & Equipment"): "Office Phones & Intercom Systems",
+    ("Office Supplies for Remote Work", "Office Supplies & Equipment"): "Office Stationery",
+    ("Hydroponic & Vertical Farming Systems", "Agriculture & Food Products"): "Hydroponic & Vertical Farming Systems",
+    ("DJ & Studio Equipment", "Sports & Entertainment"): "Musical Instruments",
+    ("Medical Rehabilitation Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
+    ("Beauty Equipment (Salon, Spa Devices)", "Health & Personal Care"): "Beauty Equipment (Salon, Spa Devices)",
+    ("Kitchen Appliances", "Home & Lifestyle"): "Small Kitchen Appliances",
+    ("Vehicle Electrical Systems", "Automotive & Transport"): "Vehicle Electrical Systems",
+    ("Aquaculture & Fisheries Equipment", "Machinery & Equipment"): "Aquaculture & Fisheries Equipment",
+    ("Water Sports Equipment (Swimming, Surfing, Diving)", "Sports & Entertainment"): "Water Sports Equipment (Swimming, Surfing, Diving)",
+    ("Martial Arts & Boxing Equipment", "Sports & Entertainment"): "Martial Arts & Boxing Equipment",
+    ("Cycling Gear & Accessories", "Sports & Entertainment"): "Cycling Gear & Accessories",
+    ("Gym Accessories (Mats, Belts, Bands)", "Sports & Entertainment"): "Gym Accessories (Mats, Belts, Bands)",
+    ("Skating & Skateboarding Equipment", "Sports & Entertainment"): "Skating & Skateboarding Equipment",
+    ("Recreational Games (Table Tennis, Pool, Carrom)", "Sports & Entertainment"): "Recreational Games (Table Tennis, Pool, Carrom)",
+    ("Trophies, Medals & Awards", "Sports & Entertainment"): "Trophies, Medals & Awards",
+    ("Fan Merchandise & Collectibles", "Sports & Entertainment"): "Fan Merchandise & Collectibles",
+    ("Talent Management & Booking Agencies", "Services & Support"): "Event Management & Promotion",
+    ("Entertainment Licensing & Distribution", "Services & Support"): "Event Management & Promotion",
+    ("Sports Facility Construction Services", "Services & Support"): "Engineering & Technical Services",
+    ("Stage, Set & Truss Equipment", "Sports & Entertainment"): "Stage, Set & Truss Equipment",
+    ("Team Sports Equipment (Football, Basketball, Cricket)", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Outdoor Sports Gear (Camping, Hiking, Climbing)", "Sports & Entertainment"): "Outdoor Sports Gear (Camping, Hiking, Climbing)",
+    ("Indoor Sports Equipment", "Sports & Entertainment"): "Indoor Sports Equipment",
+    ("Sportswear & Activewear", "Sports & Entertainment"): "Sportswear & Activewear",
+    ("Sportswear Branding & Customization", "Sports & Entertainment"): "Sportswear Branding & Customization",
+    ("Board Games & Puzzles", "Sports & Entertainment"): "Board Games & Puzzles",
+    ("Athletic Footwear", "Sports & Entertainment"): "Athletic Footwear",
+    ("Fitness Equipment (Home & Commercial)", "Sports & Entertainment"): "Fitness Equipment (Home & Commercial)",
+    ("Fitness & Sports Training Services", "Services & Support"): "Training & Skill Development",
+    ("Yoga Accessories & Equipment", "Sports & Entertainment"): "Yoga Accessories & Equipment",
+    ("Musical Instruments", "Sports & Entertainment"): "Musical Instruments",
+    ("Hockey Equipment", "Sports & Entertainment"): "Indoor Sports Equipment",
+    ("Baseball Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Volleyball Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Board Game Accessories", "Sports & Entertainment"): "Board Games & Puzzles",
+    ("Cricket Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Tennis Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Badminton Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
+    ("Children's Play Equipment & Toys", "Sports & Entertainment"): "Board Games & Puzzles",
+    ("Electronic Toys & Educational Toys", "Home & Lifestyle"): "Children's Play Equipment & Toys",
+    ("Gaming Consoles & Accessories", "Electrical & Electronics"): "Gaming Consoles & Accessories",
+    ("Baby Furniture", "Home & Lifestyle"): "Bedroom Furniture",
+    ("Home Appliances", "Electrical & Electronics"): "Home Appliances",
+    ("Kitchen Equipment", "Home & Lifestyle"): "Modular Kitchen Units",
+    ("Pediatric Therapy Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
+    ("Gait Training Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
+    ("Wellness Devices", "Health & Personal Care"): "Health Monitoring Devices",
+    ("Fitness & Wellness Equipment", "Sports & Entertainment"): "Fitness Equipment (Home & Commercial)",
+    ("Heavy Duty Trucks", "Automotive & Transport"): "Commercial Vehicles",
+    ("Garment Accessories & Trims", "Apparel & Fashion"): "Garment Accessories & Trims",
+    ("Three-Wheelers", "Automotive & Transport"): "Two-Wheelers",
+    ("Food Additives & Preservatives", "Agriculture & Food Products"): "Food Additives & Preservatives",
+    ("Food Additives & Ingredients", "Agriculture & Food Products"): "Food Additives & Preservatives",
+    ("Agrochemicals", "Agriculture & Food Products"): "Pesticides & Crop Protection",
+    ("Agrochemicals & Biostimulants", "Agriculture & Food Products"): "Pesticides & Crop Protection",
+    ("Pesticides & Crop Protection", "Agriculture & Food Products"): "Pesticides & Crop Protection",
+    ("Organic Pesticides", "Agriculture & Food Products"): "Pesticides & Crop Protection",
+    ("Fertilizers & Soil Conditioners", "Agriculture & Food Products"): "Fertilizers & Soil Conditioners",
+    ("Workshop Equipment", "Tools & Hardware"): "Workbenches & Workshop Tools",
+    ("Tool Room Equipment", "Tools & Hardware"): "Tool Storage & Organizers",
+    ("Recycling Machinery", "Machinery & Equipment"): "Recycling Machinery",
+    ("Consumer Electronics", "Electrical & Electronics"): "Consumer Electronics",
+    ("Digital Marketing Services", "Services & Support"): "Digital Marketing Services",
+    ("Mobile App Development", "Services & Support"): "Web Design & Development",
+    ("Translation & Localization Services", "Services & Support"): "Translation & Localization Services",
+    ("Digital Imaging Services", "Services & Support"): "Digital Marketing Services",
+    ("AR/VR Development Services", "Services & Support"): "Web Design & Development",
+    ("Barcode Labels & RFID Tags", "Packaging & Printing"): "Barcode Labels & RFID Tags",
+    ("Control Panels & PLCs", "Electrical & Electronics"): "Control Panels & PLCs",
+    ("Cold Chain Logistics & Storage", "Agriculture & Food Products"): "Cold Chain Logistics & Storage",
+    ("Restroom Furniture", "Office Supplies & Equipment"): "Office Furniture",
+    ("Fragrances & Essential Oils", "Chemicals & Raw Materials"): "Fragrances & Essential Oils",
+    ("Industrial Gases", "Chemicals & Raw Materials"): "Industrial Gases",
+}
+
 # ============================================================
-# P1 FIX: SUBCATEGORY NAME CANONICAL MAPPING
-# Resolve case duplicates and naming inconsistencies
+# SUBCATEGORY NAME CANONICAL MAP
+# Resolves case duplicates and naming inconsistencies
 # ============================================================
 SUBCATEGORY_NAME_CANONICAL = {
     # Case duplicates
@@ -240,19 +411,15 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Lighting Accessories": "Lighting Fixtures & Fittings",
     "Lighting Control Systems": "Automation & Control Systems",
     "Networking Devices": "Networking Equipment",
-    "Semiconductors & ICs": "Semiconductors & ICs",
     "Security Systems": "Surveillance & Security Systems",
     "CCTV & Surveillance Systems": "Surveillance & Security Systems",
     "Access Control Systems": "Access Control Devices",
     "Time Attendance & Access Control Devices": "Access Control Devices",
-    "Generators & Alternators": "Generators & Alternators",
-    "Inverters & UPS Systems": "Inverters & UPS Systems",
     "Uninterruptible Power Supplies (UPS)": "Inverters & UPS Systems",
     "Battery Storage Systems": "Batteries, Chargers & Power Banks",
     "EV Charging Equipment": "Electric Vehicles & Charging Equipment",
     "EV Components & Batteries": "Electric Vehicles & Charging Equipment",
     "Control Panels & Switchgear": "Control Panels & PLCs",
-    "Automation & Control Systems": "Automation & Control Systems",
     "Smart Building Systems & Automation": "Automation & Control Systems",
     "Embedded Systems": "PCB & Electronic Components",
     "Passive Components": "PCB & Electronic Components",
@@ -271,11 +438,9 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Power Distribution": "Industrial Electrical Equipment",
     "Electrical Hand Tools": "Electrical Equipment for Industrial Use",
     "AR/VR Gaming & Simulation Products": "Virtual Reality Equipment",
-    "Recycling & Waste Processing Materials": "PCB & Electronic Components",
 
     # Machinery consolidations
     "3D Printing Equipment": "3D Printing Equipment for Industry",
-    "Cnc Machines": "CNC Machines",
     "Machine Tools": "Machine Tools & Accessories",
     "Pumps": "Pumps & Valves",
     "Pumps & Irrigation": "Pumps & Valves",
@@ -287,7 +452,6 @@ SUBCATEGORY_NAME_CANONICAL = {
     "HVAC Systems": "HVAC Equipment",
     "Irrigation Systems": "Irrigation Systems & Equipment",
     "Irrigation Components": "Irrigation Systems & Equipment",
-    "Pumps & Irrigation": "Irrigation Systems & Equipment",
     "Wood Processing Machinery": "Woodworking Machinery",
     "Metal Processing Machinery": "Metalworking Machinery",
     "Printing & Packaging Machinery": "Packaging Machinery",
@@ -301,8 +465,6 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Greenhouse Supplies": "Greenhouse Structures",
     "Greenhouse Climate Control": "Greenhouse Structures",
     "Hydroponic Systems": "Hydroponic & Vertical Farming Systems",
-    "Post-Harvest Processing": "Food Processing Machinery",
-    "Pre-Processing & Cleaning Equipment": "Food Processing Machinery",
     "Spraying Equipment": "Agricultural Machinery",
     "Planting Machinery": "Agricultural Machinery",
     "Threshing Machinery": "Agricultural Machinery",
@@ -345,14 +507,11 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Lathe Machine Accessories": "Machine Tools & Accessories",
     "Bearing Tools": "Machine Tools & Accessories",
     "Drilling Machine Accessories": "Machine Tools & Accessories",
-    "Workbenches & Workshop Tools": "Workbenches & Workshop Tools",
-    "Stage, Set & Truss Equipment": "Sports & Entertainment",
     "Filaments & Materials": "3D Printing Equipment for Industry",
     "Manual Cleaning Tools": "Industrial Cleaning Equipment",
     "Manufacturing Equipment": "Industrial Tools",
     "Environmental Control Systems": "HVAC Equipment",
     "Material Separation Equipment": "Mining & Metallurgy Machinery",
-    "Casting & Forging Equipment": "Casting & Forging Equipment",
 
     # Construction consolidations
     "Building Materials": "Cement, Bricks & Concrete Materials",
@@ -360,18 +519,15 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Glazing Components": "Glass & Glazing Materials",
     "Glass Processing Services": "Glass & Glazing Materials",
     "Acoustic Insulation": "Insulation Materials",
-    "Lighting Fixtures & Fittings": "Lighting Fixtures & Fittings",
-    "Machinery & Equipment": None,  # Invalid subcategory name — reassign products
-    "Services": None,  # Invalid subcategory name — reassign products
+    "Machinery & Equipment": None,
+    "Services": None,
     "Tools & Equipment": "Construction Tools & Hand Tools",
     "Safety Equipment": "Construction Safety Equipment",
     "Painting Tools & Equipment": "Paints, Coatings & Finishes",
     "Concrete Mixers & Batching Plants": "Construction Machinery",
-    "Surveying Equipment": "Machinery & Equipment",
-    "HVAC Systems": "HVAC Equipment",
+    "Surveying Equipment": "Testing & Measuring Instruments",
     "Installation & Commissioning Services": "Engineering & Technical Services",
     "Instrument Calibration Services": "Engineering & Technical Services",
-    "Glass Processing Services": "Glass & Glazing Materials",
     "Maintenance & Repair Services": "Engineering & Technical Services",
 
     # Chemicals consolidations
@@ -404,19 +560,6 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Furniture Accessories": "Office Furniture",
     "Labeling Consumables": "Filing & Organizing Supplies",
     "Networking Equipment": "Computer Accessories",
-    "Monitors, CPUs & Workstations": "Computer Accessories",
-    "Packaging Machinery": None,  # Invalid in Office — reassign products
-    "Machinery & Equipment": None,  # Invalid in Office — reassign products
-    "Office Phones & Intercom Systems": "Office Supplies & Equipment",
-
-    # Packaging consolidations
-    "3D Prototyping Services": "3D & Custom Prototyping for Packaging",
-    "Vacuum & Shrink Packaging Machinery": "Shrink Wrapping Machines",
-    "Vacuum & Shrink Packaging Materials": "Vacuum & Shrink Packaging",
-    "RFID Tags": "Barcode Labels & RFID Tags",
-    "Raw Materials": None,  # Invalid — reassign to Chemicals & Raw Materials
-    "Machinery & Equipment": None,  # Invalid — reassign to Machinery & Equipment
-    "Food Packaging Materials": "Food Grade Packaging",
 
     # Services consolidations
     "Website Design & Development": "Web Design & Development",
@@ -425,27 +568,9 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Equipment Services": "IT Support & Managed Services",
     "Greenhouse Services": "Environmental Consulting & Audits",
     "Interior Painting Services": "Interior Design & Space Planning",
-    "Fragrances & Essential Oils": None,  # Not a service — reassign to Chemicals
-    "Industrial Gases": None,  # Not a service — reassign to Chemicals
+    "Fragrances & Essential Oils": None,
+    "Industrial Gases": None,
     "Sports Facility Construction Services": "Engineering & Technical Services",
-
-    # Software consolidations
-    "AR/VR Development Services": "AR/VR Development Software",
-    "AR/VR Development Tools": "AR/VR Development Software",
-    "Simulation Software": "Simulation & Modeling Software",
-    "Industrial Software": "Industrial Automation Software",
-    "Industrial Control Systems": "Industrial Automation Software",
-    "Digital Imaging Services": "Digital Marketing Services",
-    "Digital Health & Wellness Software": "Mental Health & Wellness Software",
-    "STEM Software": "Educational Software",
-    "Educational Games": "Educational Software",
-    "Software & IT Solutions": None,  # Invalid subcategory name
-    "Fashion Retail POS Systems": "Retail Point of Sale (POS) Software",
-    "Healthcare IT Solutions": "Healthcare IT Solutions",
-    "Cold Chain Logistics & Storage": None,  # Not software — reassign
-    "Garment Accessories & Trims": None,  # Not software — reassign
-    "Barcode Labels & RFID Tags": None,  # Not software — reassign
-    "Control Panels & PLCs": None,  # Not software — reassign
 
     # Health consolidations
     "Aromatherapy & Wellness Products": "Essential Oils & Aromatherapy",
@@ -457,7 +582,7 @@ SUBCATEGORY_NAME_CANONICAL = {
     "Medical Protective Gear": "Personal Protective Equipment (PPE)",
     "Kitchen & Dining Aids": "Elderly Care Products & Solutions",
     "Telehealth Devices & Software": "Healthcare IT Solutions",
-    "Software & IT Solutions": None,  # Invalid subcategory name
+    "Software & IT Solutions": None,
     "Women's personal care products": "Women's Personal Care Products",
     "Over-the-Counter Medicines": "Over-The-Counter Medicines",
 
@@ -467,126 +592,58 @@ SUBCATEGORY_NAME_CANONICAL = {
     "International Cookware": "Cookware & Bakeware",
     "Cushion Covers": "Cushions & Throws",
     "Throws": "Cushions & Throws",
-    "Bath Linens And Towels": "Bath Linens & Towels",
-    "Mattresses And Mattress Toppers": "Mattresses & Mattress Toppers",
-    "Artificial Plants And Flowers": "Artificial Plants & Flowers",
     "Laundry Care Equipment": "Cleaning Tools & Equipment",
     "Air Purifiers & Fans": "Cleaning Tools & Equipment",
-    "Smart Home Devices": "Smart Home Devices",
     "Sound & Lighting Systems": "Lamps & Lighting Fixtures",
     "Sustainable Stationery": "Gift Items & Handicrafts",
     "Sustainable Bath & Body": "Home Textiles",
     "Sustainable & Eco-Friendly Products": "Gift Items & Handicrafts",
-    "Services": None,  # Invalid subcategory name
-    "DJ & Studio Equipment": None,  # Goes to Sports & Entertainment
-    "Gaming Consoles & Accessories": None,  # Goes to Electrical & Electronics
-    "Event Management Services": None,  # Goes to Services & Support
+    "DJ & Studio Equipment": None,
+    "Gaming Consoles & Accessories": None,
+    "Event Management Services": None,
 
-    # Sports & Entertainment consolidations
+    # Sports consolidations
     "Fitness & Wellness Equipment": "Fitness Equipment (Home & Commercial)",
     "Sports Equipment (Balls, Bats, Rackets, Nets)": "Team Sports Equipment (Football, Basketball, Cricket)",
-    "Consumer Electronics": None,  # Goes to Electrical & Electronics
-    "Recycling Machinery": None,  # Goes to Machinery & Equipment
-    "Children's Play Equipment & Toys": "Board Games & Puzzles",
+    "Consumer Electronics": None,
+    "Recycling Machinery": None,
 
-    # Tools & Hardware consolidations
+    # Tools consolidations
     "Scaffolding": "Ladders & Scaffolding",
     "Scaffolding Components": "Ladders & Scaffolding",
     "Maintenance & Repair Tools": "Hand Tools (Wrenches, Hammers, Screwdrivers)",
-    "Machinery & Equipment": None,  # Invalid subcategory name
-    "Bathroom Fittings": "Locks, Latches & Security Hardware",
-    "Gardening Tools": "Gardening Tools",
     "Thread Repair Kits": "Fasteners",
-    "Hydraulic Tools": "Hydraulic Tools",
+    "Bathroom Fittings": "Locks, Latches & Security Hardware",
+
+    # Packaging consolidations
+    "3D Prototyping Services": "3D & Custom Prototyping for Packaging",
+    "Vacuum & Shrink Packaging Machinery": "Shrink Wrapping Machines",
+    "Vacuum & Shrink Packaging Materials": "Vacuum & Shrink Packaging",
+    "RFID Tags": "Barcode Labels & RFID Tags",
+    "Food Packaging Materials": "Food Grade Packaging",
 }
 
-# ============================================================
-# CATEGORY FALLBACK SUBCATEGORIES
-# When a subcategory is remapped to a new category,
-# use this as the target subcategory
-# ============================================================
-SUBCATEGORY_REMAP_TARGET = {
-    # What subcategory to use when moving to a new category
-    ("Leather & Hides", "Apparel & Fashion"): "Leather Materials",
-    ("Textile Raw Materials", "Apparel & Fashion"): "Fabrics",
-    ("Recycled Apparel", "Apparel & Fashion"): "Sustainable Apparel",
-    ("Fashion Design Services", "Services & Support"): "Graphic Design & Branding",
-    ("Timber & Logs", "Construction & Infrastructure"): "Wood & Plywood Products",
-    ("Wood & Wood Products", "Construction & Infrastructure"): "Wood & Plywood Products",
-    ("Processed Wood", "Construction & Infrastructure"): "Wood & Plywood Products",
-    ("Biodegradable & Sustainable Raw Materials", "Chemicals & Raw Materials"): "Biodegradable & Sustainable Raw Materials",
-    ("Tiles, Marble, Granite & Flooring", "Construction & Infrastructure"): "Tiles, Marble, Granite & Flooring",
-    ("Sunglasses & Eyewear", "Apparel & Fashion"): "Accessories",
-    ("Office Telephones & Intercom Systems", "Office Supplies & Equipment"): "Office Phones & Intercom Systems",
-    ("Office Supplies for Remote Work", "Office Supplies & Equipment"): "Office Stationery",
-    ("Hydroponic & Vertical Farming Systems", "Agriculture & Food Products"): "Hydroponic & Vertical Farming Systems",
-    ("DJ & Studio Equipment", "Sports & Entertainment"): "Musical Instruments",
-    ("Medical Rehabilitation Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
-    ("Beauty Equipment (Salon, Spa Devices)", "Health & Personal Care"): "Beauty Equipment (Salon, Spa Devices)",
-    ("Kitchen Appliances", "Home & Lifestyle"): "Small Kitchen Appliances",
-    ("Vehicle Electrical Systems", "Automotive & Transport"): "Vehicle Electrical Systems",
-    ("Aquaculture & Fisheries Equipment", "Machinery & Equipment"): "Aquaculture & Fisheries Equipment",
-    ("Water Sports Equipment (Swimming, Surfing, Diving)", "Sports & Entertainment"): "Water Sports Equipment (Swimming, Surfing, Diving)",
-    ("Martial Arts & Boxing Equipment", "Sports & Entertainment"): "Martial Arts & Boxing Equipment",
-    ("Cycling Gear & Accessories", "Sports & Entertainment"): "Cycling Gear & Accessories",
-    ("Gym Accessories (Mats, Belts, Bands)", "Sports & Entertainment"): "Gym Accessories (Mats, Belts, Bands)",
-    ("Skating & Skateboarding Equipment", "Sports & Entertainment"): "Skating & Skateboarding Equipment",
-    ("Recreational Games (Table Tennis, Pool, Carrom)", "Sports & Entertainment"): "Recreational Games (Table Tennis, Pool, Carrom)",
-    ("Trophies, Medals & Awards", "Sports & Entertainment"): "Trophies, Medals & Awards",
-    ("Fan Merchandise & Collectibles", "Sports & Entertainment"): "Fan Merchandise & Collectibles",
-    ("Talent Management & Booking Agencies", "Services & Support"): "Event Management & Promotion",
-    ("Entertainment Licensing & Distribution", "Services & Support"): "Event Management & Promotion",
-    ("Sports Facility Construction Services", "Services & Support"): "Engineering & Technical Services",
-    ("Stage, Set & Truss Equipment", "Sports & Entertainment"): "Stage, Set & Truss Equipment",
-    ("Team Sports Equipment (Football, Basketball, Cricket)", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Outdoor Sports Gear (Camping, Hiking, Climbing)", "Sports & Entertainment"): "Outdoor Sports Gear (Camping, Hiking, Climbing)",
-    ("Indoor Sports Equipment", "Sports & Entertainment"): "Indoor Sports Equipment",
-    ("Sportswear & Activewear", "Sports & Entertainment"): "Sportswear & Activewear",
-    ("Sportswear Branding & Customization", "Sports & Entertainment"): "Sportswear Branding & Customization",
-    ("Board Games & Puzzles", "Sports & Entertainment"): "Board Games & Puzzles",
-    ("Athletic Footwear", "Sports & Entertainment"): "Athletic Footwear",
-    ("Fitness Equipment (Home & Commercial)", "Sports & Entertainment"): "Fitness Equipment (Home & Commercial)",
-    ("Fitness & Sports Training Services", "Services & Support"): "Training & Skill Development",
-    ("Yoga Accessories & Equipment", "Sports & Entertainment"): "Yoga Accessories & Equipment",
-    ("Musical Instruments", "Sports & Entertainment"): "Musical Instruments",
-    ("Hockey Equipment", "Sports & Entertainment"): "Indoor Sports Equipment",
-    ("Baseball Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Volleyball Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Board Game Accessories", "Sports & Entertainment"): "Board Games & Puzzles",
-    ("Cricket Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Tennis Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Badminton Equipment", "Sports & Entertainment"): "Team Sports Equipment (Football, Basketball, Cricket)",
-    ("Children's Play Equipment & Toys", "Sports & Entertainment"): "Board Games & Puzzles",
-    ("Electronic Toys & Educational Toys", "Home & Lifestyle"): "Children's Play Equipment & Toys",
-    ("Gaming Consoles & Accessories", "Electrical & Electronics"): "Gaming Consoles & Accessories",
-    ("Baby Furniture", "Home & Lifestyle"): "Bedroom Furniture",
-    ("Home Appliances", "Electrical & Electronics"): "Home Appliances",
-    ("Kitchen Equipment", "Home & Lifestyle"): "Modular Kitchen Units",
-    ("Pediatric Therapy Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
-    ("Gait Training Equipment", "Health & Personal Care"): "Rehabilitation & Physiotherapy Equipment",
-    ("Wellness Devices", "Health & Personal Care"): "Health Monitoring Devices",
-    ("Fitness & Wellness Equipment", "Sports & Entertainment"): "Fitness Equipment (Home & Commercial)",
-    ("Heavy Duty Trucks", "Automotive & Transport"): "Commercial Vehicles",
-    ("Garment Accessories & Trims", "Apparel & Fashion"): "Garment Accessories & Trims",
-    ("Three-Wheelers", "Automotive & Transport"): "Two-Wheelers",
-    ("Food Additives & Preservatives", "Agriculture & Food Products"): "Food Additives & Preservatives",
-    ("Food Additives & Ingredients", "Agriculture & Food Products"): "Food Additives & Preservatives",
-    ("Agrochemicals", "Agriculture & Food Products"): "Pesticides & Crop Protection",
-    ("Agrochemicals & Biostimulants", "Agriculture & Food Products"): "Pesticides & Crop Protection",
-    ("Pesticides & Crop Protection", "Agriculture & Food Products"): "Pesticides & Crop Protection",
-    ("Organic Pesticides", "Agriculture & Food Products"): "Pesticides & Crop Protection",
-    ("Fertilizers & Soil Conditioners", "Agriculture & Food Products"): "Fertilizers & Soil Conditioners",
-    ("Workshop Equipment", "Tools & Hardware"): "Workbenches & Workshop Tools",
-    ("Tool Room Equipment", "Tools & Hardware"): "Tool Storage & Organizers",
-    ("Recycling Machinery", "Machinery & Equipment"): "Recycling Machinery",
-    ("Consumer Electronics", "Electrical & Electronics"): "Consumer Electronics",
-    ("Barcode Labels & RFID Tags", "Packaging & Printing"): "Barcode Labels & RFID Tags",
-    ("Control Panels & PLCs", "Electrical & Electronics"): "Control Panels & PLCs",
-    ("Cold Chain Logistics & Storage", "Agriculture & Food Products"): "Cold Chain Logistics & Storage",
-    ("Restroom Furniture", "Office Supplies & Equipment"): "Office Furniture",
-    ("Fragrances & Essential Oils", "Chemicals & Raw Materials"): "Fragrances & Essential Oils",
-    ("Industrial Gases", "Chemicals & Raw Materials"): "Industrial Gases",
+INVALID_SUBCATEGORY_NAMES = {
+    "Machinery & Equipment", "Software & IT Solutions", "Services",
+    "Raw Materials", "Industrial Gases", "Safety Equipment",
+    "Packaging Machinery", "Tools & Equipment", "Services & Support",
+    "Apparel & Fashion", "Agriculture & Food Products",
+    "Automotive & Transport", "Chemicals & Raw Materials",
+    "Construction & Infrastructure", "Electrical & Electronics",
+    "Health & Personal Care", "Home & Lifestyle",
+    "Office Supplies & Equipment", "Packaging & Printing",
+    "Sports & Entertainment", "Tools & Hardware",
+    "Medical Consumables", "Packaging Materials",
 }
+
+BUSINESS_ENTITY_KEYWORDS = [
+    'manufacturer', 'manufacturers', 'exporter', 'exporters',
+    'importer', 'importers', 'supplier', 'suppliers',
+    'trader', 'traders', 'wholesaler', 'wholesalers',
+    'distributor', 'distributors', 'dealer', 'dealers',
+    'oem', 'odm', 'buying house', 'vendor', 'vendors',
+    'agent', 'agents', 'broker', 'brokers', 'reseller',
+]
 
 CATEGORY_FALLBACK = {
     "Apparel & Fashion": "Apparel Accessories",
@@ -600,45 +657,12 @@ CATEGORY_FALLBACK = {
     "Home & Lifestyle": "Home Decor Items",
     "Health & Personal Care": "Medical Consumables",
     "Packaging & Printing": "Packaging Materials",
-    "Software & IT Solutions": "Business Management Software",
+    "Software & IT Solutions": "ERP & Business Management Software",
     "Office Supplies & Equipment": "Office Stationery",
     "Services & Support": "IT Support & Managed Services",
-    "Sports & Entertainment": "Sports Equipment (Balls, Bats, Rackets, Nets)",
+    "Sports & Entertainment": "Team Sports Equipment (Football, Basketball, Cricket)",
+    "Energy & Power": "Renewable Energy Solutions",
 }
-
-INVALID_SUBCATEGORY_NAMES = {
-    "Machinery & Equipment",
-    "Software & IT Solutions",
-    "Services",
-    "Raw Materials",
-    "Industrial Gases",
-    "Safety Equipment",
-    "Packaging Machinery",
-    "Tools & Equipment",
-    "Services & Support",
-    "Apparel & Fashion",
-    "Agriculture & Food Products",
-    "Automotive & Transport",
-    "Chemicals & Raw Materials",
-    "Construction & Infrastructure",
-    "Electrical & Electronics",
-    "Health & Personal Care",
-    "Home & Lifestyle",
-    "Office Supplies & Equipment",
-    "Packaging & Printing",
-    "Sports & Entertainment",
-    "Tools & Hardware",
-}
-
-BUSINESS_ENTITY_KEYWORDS = [
-    'manufacturer', 'manufacturers', 'exporter', 'exporters',
-    'importer', 'importers', 'supplier', 'suppliers',
-    'trader', 'traders', 'wholesaler', 'wholesalers',
-    'distributor', 'distributors', 'dealer', 'dealers',
-    'oem', 'odm', 'buying house', 'buying houses',
-    'vendor', 'vendors', 'agent', 'agents',
-    'broker', 'brokers', 'reseller', 'resellers',
-]
 
 def is_business_entity(name: str) -> bool:
     lower = name.lower()
@@ -653,24 +677,36 @@ def fix_row(row) -> dict:
     # Step 1: Canonicalize category
     cat = CANONICAL_CATEGORIES.get(cat.lower(), cat)
 
-    # Step 2: Normalize subcategory name (case duplicates, consolidation)
+    # Step 2: Fix Software subcategory names to type-based names
+    if cat == 'Software & IT Solutions' and sub in SOFTWARE_SUBCATEGORY_MAP:
+        mapped = SOFTWARE_SUBCATEGORY_MAP[sub]
+        if mapped is None:
+            # This is a service — move to Services & Support
+            cat = 'Services & Support'
+            sub = SUBCATEGORY_REMAP_TARGET.get((sub, 'Services & Support'),
+                  'Digital Marketing Services' if 'market' in sub.lower()
+                  else 'Web Design & Development')
+        else:
+            sub = mapped
+
+    # Step 3: Normalize subcategory name (case/consolidation)
     canonical_sub = SUBCATEGORY_NAME_CANONICAL.get(sub, sub)
     if canonical_sub is None:
         canonical_sub = CATEGORY_FALLBACK.get(cat, "General Products")
     sub = canonical_sub
 
-    # Step 3: Move subcategory to correct category if misplaced
+    # Step 4: Move subcategory to correct category if misplaced
     if sub in SUBCATEGORY_CATEGORY_REMAP:
         new_cat = SUBCATEGORY_CATEGORY_REMAP[sub]
         new_sub = SUBCATEGORY_REMAP_TARGET.get((sub, new_cat), sub)
         cat = new_cat
         sub = new_sub
 
-    # Step 4: Remove invalid subcategory names (category names used as subcategories)
+    # Step 5: Remove invalid subcategory names
     if sub in INVALID_SUBCATEGORY_NAMES:
         sub = CATEGORY_FALLBACK.get(cat, "General Products")
 
-    # Step 5: Remove business entities as subcategories
+    # Step 6: Remove business entity subcategories
     if is_business_entity(sub):
         sub = CATEGORY_FALLBACK.get(cat, "General Products")
 
@@ -680,7 +716,7 @@ def run():
     if is_completed("phase2b"):
         return
 
-    logger.info("Starting Phase 2B — Taxonomy Corrector v2")
+    logger.info("Starting Phase 2B — Taxonomy Corrector v3")
 
     input_path = os.path.join(PHASE2_OUTPUT_DIR, "merged_reorganized.csv")
     if not os.path.exists(input_path):
@@ -690,19 +726,18 @@ def run():
     initial = len(df)
     logger.info(f"Input rows: {initial}")
 
-    # Apply all fixes row by row
-    fixed_rows = df.apply(fix_row, axis=1, result_type='expand')
-    df['category'] = fixed_rows['category']
-    df['subcategory'] = fixed_rows['subcategory']
-    df['product_category'] = fixed_rows['product_category']
-    logger.info("All category, subcategory, and placement fixes applied")
+    fixed = df.apply(fix_row, axis=1, result_type='expand')
+    df['category'] = fixed['category']
+    df['subcategory'] = fixed['subcategory']
+    df['product_category'] = fixed['product_category']
+    logger.info("All fixes applied")
 
     # Remove exact duplicates
     before = len(df)
     df = df.drop_duplicates(subset=['category', 'subcategory', 'product_category'])
     logger.info(f"Exact duplicates removed: {before - len(df)}")
 
-    # Resolve same product in multiple subcategories within same category
+    # Resolve same product in multiple subcategories
     before = len(df)
     df['sub_len'] = df['subcategory'].str.len()
     df = df.sort_values('sub_len', ascending=False)
@@ -710,53 +745,37 @@ def run():
     df = df.drop(columns=['sub_len'])
     logger.info(f"Cross-subcategory duplicates resolved: {before - len(df)}")
 
-    # Resolve same product across multiple categories
+    # Resolve same product across categories
     before = len(df)
     df = df.drop_duplicates(subset=['product_category'], keep='first')
     logger.info(f"Cross-category duplicates resolved: {before - len(df)}")
 
-    # Drop empty rows
     df = df.dropna(subset=['category', 'subcategory', 'product_category'])
     df = df[df['product_category'].str.strip() != '']
-
-    # Sort
-    df = df.sort_values(
-        ['category', 'subcategory', 'product_category']
-    ).reset_index(drop=True)
+    df = df.sort_values(['category', 'subcategory', 'product_category']).reset_index(drop=True)
 
     final = len(df)
     sub_count = df['subcategory'].nunique()
-    logger.info(f"Phase 2B complete: {initial} → {final} rows")
-    logger.info(f"Subcategories: {sub_count}")
+    logger.info(f"Phase 2B complete: {initial} → {final} rows | {sub_count} subcategories")
     logger.info(f"\nCategory distribution:\n{df['category'].value_counts().to_string()}")
 
-    # Verify no invalid subcategory names remain
+    # Validation checks
     invalid_found = [s for s in df['subcategory'].unique() if s in INVALID_SUBCATEGORY_NAMES]
     if invalid_found:
         logger.warning(f"Invalid subcategory names still present: {invalid_found}")
     else:
-        logger.info("✅ No invalid subcategory names found")
+        logger.info("✅ No invalid subcategory names")
 
-    # Verify no cross-category subcategory duplicates
-    sub_cats = df.groupby('subcategory')['category'].nunique()
-    dup_subs = sub_cats[sub_cats > 1]
-    if not dup_subs.empty:
-        logger.warning(f"Subcategories still in multiple categories: {len(dup_subs)}")
-        for sub in list(dup_subs.index)[:10]:
-            cats = df[df['subcategory'] == sub]['category'].unique()
-            logger.warning(f"  '{sub}' → {list(cats)}")
-    else:
-        logger.info("✅ No cross-category subcategory duplicates found")
+    sw_subs = df[df['category'] == 'Software & IT Solutions']['subcategory'].value_counts()
+    logger.info(f"\nSoftware & IT Solutions subcategories:\n{sw_subs.to_string()}")
 
-    # Sports & Entertainment check
     sports_count = len(df[df['category'] == 'Sports & Entertainment'])
     logger.info(f"Sports & Entertainment: {sports_count} products")
 
     df.to_csv(input_path, index=False, encoding='utf-8')
+    corrected = os.path.join(PHASE2_OUTPUT_DIR, "corrected_taxonomy.csv")
+    df.to_csv(corrected, index=False, encoding='utf-8')
     logger.info(f"Written to {input_path}")
-
-    corrected_path = os.path.join(PHASE2_OUTPUT_DIR, "corrected_taxonomy.csv")
-    df.to_csv(corrected_path, index=False, encoding='utf-8')
 
     mark_completed("phase2b")
 
