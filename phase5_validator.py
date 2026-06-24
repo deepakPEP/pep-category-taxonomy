@@ -10,47 +10,72 @@ logger = get_logger("phase5")
 os.makedirs(PHASE5_OUTPUT_DIR, exist_ok=True)
 
 # ============================================================
+# FOOD & BEVERAGE vs AGRICULTURE & FARMING SUBCATEGORY SPLIT
+# Applied AFTER Phase 4 synonym merge to re-establish separation
+# ============================================================
+FOOD_BEVERAGE_SUBCATEGORIES = {
+    'Bakery & Confectionery Products',
+    'Beverages (Tea, Coffee, Juices)',
+    'Snacks & Namkeens',
+    'Condiments & Sauces',
+    'Canned & Preserved Foods',
+    'Frozen & Processed Foods',
+    'Ready-to-Eat & Instant Foods',
+    'Dairy Products & Alternatives',
+    'Meat, Poultry & Seafood',
+    'Edible Oils & Fats',
+    'Baby Food Products',
+    'Health & Nutritional Foods',
+    'Catering Supplies & Ingredients',
+    'Food Additives & Preservatives',
+    'Flour, Sugar, Salt & Other Essentials',
+    'Tobacco & Smoking Products',
+    'Fresh Fruits & Vegetables',
+    'Spices & Herbs',
+    'Grains, Cereals & Pulses',
+    'Baking Ingredients',
+}
+
+AGRICULTURE_FARMING_SUBCATEGORIES = {
+    'Seeds & Planting Materials',
+    'Fertilizers & Soil Conditioners',
+    'Pesticides & Crop Protection',
+    'Agricultural Equipment & Implements',
+    'Agricultural Produce',
+    'Organic Produce',
+    'Beekeeping Supplies',
+    'Livestock Farming Equipment',
+    'Poultry Farming Equipment',
+    'Aquaculture & Fisheries Equipment',
+    'Irrigation Systems & Equipment',
+    'Hydroponic & Vertical Farming Systems',
+    'Agricultural Consultancy Services',
+    'Organic Farming Supplies',
+    'Cold Chain Logistics & Storage',
+    'Food Testing & Quality Control Services',
+    'Agricultural Machinery',
+    'Animal Feed & Nutrition',
+}
+
+# ============================================================
 # FIX A — Redistribute Agriculture & Food Products leftover
-# Every subcategory mapped to its correct category + subcategory
 # ============================================================
 FIX_A_REMAP = {
-    # Baking Ingredients → Food & Beverage
     'Baking Ingredients': ('Food & Beverage', 'Bakery & Confectionery Products'),
-
-    # Certification Services → Services & Support
     'Certification Services': ('Services & Support', 'Certification & Compliance Services'),
-
-    # Excess Inventory → DELETE (not a product type)
     'Excess Inventory': None,
-
-    # Food Grade Packaging → Packaging & Printing
     'Food Grade Packaging': ('Packaging & Printing', 'Food Grade Packaging'),
-
-    # Food Processing Machinery → Machinery & Equipment
     'Food Processing Machinery': ('Machinery & Equipment', 'Food Processing Machinery'),
-
-    # Gardening Tools → Tools & Hardware
     'Gardening Tools': ('Tools & Hardware', 'Gardening Tools'),
-
-    # Manufacturing Services → Services & Support
     'Manufacturing Services': ('Services & Support', 'Contract Manufacturing Services'),
-
-    # Poultry Farming Services → Services & Support
     'Poultry Farming Services': ('Services & Support', 'Agricultural & Farming Services'),
-
-    # Sports Nutrition & Supplements → Health & Personal Care
     'Sports Nutrition & Supplements': ('Health & Personal Care', 'Health Supplements & Nutraceuticals'),
-
-    # Tobacco & Smoking Products → Food & Beverage
     'Tobacco & Smoking Products': ('Food & Beverage', 'Tobacco & Smoking Products'),
-
-    # Training & Capacity Building → Services & Support
     'Training & Capacity Building': ('Services & Support', 'Training & Skill Development'),
 }
 
 # ============================================================
-# FIX B — Remove Energy & Power category (too few products)
-# Remap 3 products to correct categories
+# FIX B — Remove Energy & Power (too few products)
 # ============================================================
 FIX_B_ENERGY_REMAP = {
     'Biogas Plant Machinery': ('Machinery & Equipment', 'Renewable Energy Machinery'),
@@ -59,11 +84,10 @@ FIX_B_ENERGY_REMAP = {
 }
 
 # ============================================================
-# FIX C — Reclassify ERP overload (228 products → correct subcategories)
-# Exact product → correct subcategory mapping
+# FIX C — Reclassify ERP overload
 # ============================================================
 FIX_C_PRODUCT_SUBCATEGORY = {
-    # → Creative & Game Development Software
+    # Creative & Game Development Software
     'AR Game Development Platforms': 'Creative & Game Development Software',
     'AR/VR Multiplayer Game Platforms': 'Creative & Game Development Software',
     'Custom VR Environments': 'Creative & Game Development Software',
@@ -84,8 +108,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Virtual Esports Solutions': 'Creative & Game Development Software',
     'Virtual Reality Fitness Training': 'Creative & Game Development Software',
     'Virtual Reality for Education': 'Creative & Game Development Software',
-
-    # → IoT & Smart Building Software
+    # IoT & Smart Building Software
     'Air Quality Monitoring Devices': 'IoT & Smart Building Software',
     'App-Based Monitoring Systems': 'IoT & Smart Building Software',
     'Automated Alert & Reporting Tools': 'IoT & Smart Building Software',
@@ -120,8 +143,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Wireless Control Systems': 'IoT & Smart Building Software',
     'Zigbee/Z-Wave Enabled Devices': 'IoT & Smart Building Software',
     'HVAC Automation Controls': 'IoT & Smart Building Software',
-
-    # → CRM & Sales Automation Software
+    # CRM & Sales Automation
     'CRM & Sales Automation Tools': 'CRM & Sales Automation Software',
     'Cloud-Based Fashion POS Software': 'CRM & Sales Automation Software',
     'Cloud-Based Apparel ERP Providers': 'CRM & Sales Automation Software',
@@ -140,8 +162,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Return & Exchange Management Systems': 'CRM & Sales Automation Software',
     'SaaS Subscription POS Providers': 'CRM & Sales Automation Software',
     'Sales Analytics & Reporting Tools': 'CRM & Sales Automation Software',
-
-    # → HR & Payroll Software
+    # HR & Payroll
     'Attendance & HRMS Software': 'HR & Payroll Software',
     'Biometric Attendance Systems': 'HR & Payroll Software',
     'HR & Payroll Management Software': 'HR & Payroll Software',
@@ -149,8 +170,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Human Resource Management Systems (HRMS)': 'HR & Payroll Software',
     'Payroll Software Solutions': 'HR & Payroll Software',
     'Time & Attendance Management Software': 'HR & Payroll Software',
-
-    # → Healthcare IT Software
+    # Healthcare IT
     'Cloud-Based Medical Transcription Tools': 'Healthcare IT Software',
     'Diagnostic Software & Scanners': 'Healthcare IT Software',
     'Go-To-Market Strategy for Wellness Brands': 'Healthcare IT Software',
@@ -158,8 +178,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Hospital Information Management Systems (HIMS)': 'Healthcare IT Software',
     'Medical Billing Software Solutions': 'Healthcare IT Software',
     'Medical VR Equipment': 'Healthcare IT Software',
-
-    # → Industry-Specific Software
+    # Industry-Specific
     '3D Virtual Prototyping': 'Industry-Specific Software',
     'AI-Based Crop Advisory System Setup': 'Industry-Specific Software',
     'AI-Based Surveillance Cleaning Bots': 'Industry-Specific Software',
@@ -201,8 +220,7 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Vibration Monitoring for Bearings': 'Industry-Specific Software',
     'Waste Tracking Logs & Registers': 'Industry-Specific Software',
     'Water Quality Testing for Food Units': 'Industry-Specific Software',
-
-    # → Cloud & Productivity Software
+    # Cloud & Productivity
     'Accounting & Billing Software Development': 'Cloud & Productivity Software',
     'Accounting & Bookkeeping SaaS': 'Cloud & Productivity Software',
     'Accounting Software (Tally, QuickBooks, Zoho Books)': 'Cloud & Productivity Software',
@@ -246,87 +264,20 @@ FIX_C_PRODUCT_SUBCATEGORY = {
     'Web Application Development': 'Cloud & Productivity Software',
     'Website & Landing Page Builders': 'Cloud & Productivity Software',
     'Workflow Automation Software': 'Cloud & Productivity Software',
-
-    # → ERP & Business Management Software (genuine ERP products — keep)
-    'Apparel Business Intelligence Tools': 'ERP & Business Management Software',
-    'Apparel Dropshipping Management Software': 'ERP & Business Management Software',
-    'Business Intelligence & Analytics Platforms': 'ERP & Business Management Software',
-    'Custom ERP for Fashion Brands': 'ERP & Business Management Software',
-    'E-commerce Integrated ERP (Shopify, WooCommerce)': 'ERP & Business Management Software',
-    'ERP Integration Services for Garment': 'ERP & Business Management Software',
-    'ERP Software Licenses': 'ERP & Business Management Software',
-    'Enterprise Resource Planning (ERP) Tools': 'ERP & Business Management Software',
-    'Enterprise Software Solutions': 'ERP & Business Management Software',
-    'Erp Software Development': 'ERP & Business Management Software',
-    'Facility Management Software': 'ERP & Business Management Software',
-    'Fashion Design & Development ERP': 'ERP & Business Management Software',
-    'Garment Manufacturing ERP Software': 'ERP & Business Management Software',
-    'Inventory Management Software': 'ERP & Business Management Software',
-    'Inventory Management Software for Apparel': 'ERP & Business Management Software',
-    'Mobile ERP Solutions for Apparel Units': 'ERP & Business Management Software',
-    'Multi-Warehouse Apparel Management Software': 'ERP & Business Management Software',
-    'Multi-channel Retail ERP Solutions': 'ERP & Business Management Software',
-    'Online Fitness Program Marketplaces': 'ERP & Business Management Software',
-    'Online Trophy Customization Tools': 'ERP & Business Management Software',
-    'Order Processing & Fulfillment Systems': 'ERP & Business Management Software',
-    'Product Lifecycle Management (Plm) Software': 'ERP & Business Management Software',
-    'Production Status Monitoring ERP': 'ERP & Business Management Software',
-    'Raw Material Management ERP': 'ERP & Business Management Software',
-    'Stock Replenishment & Forecasting Tools': 'ERP & Business Management Software',
-    'Textile Cad/Cam Systems': 'ERP & Business Management Software',
-    'Textile Production ERP Systems': 'ERP & Business Management Software',
-    'Vendor Management Software for Apparel': 'ERP & Business Management Software',
-
-    # Toys — move to Home & Lifestyle
-    'Augmented Reality (AR) Toys': None,  # → Home & Lifestyle
-    'Baby Monitors': None,
-    'Digital Flashcards': None,
-    'Electronic Board Games': None,
-    'Electronic Building Blocks': None,
-    'Electronic Drawing Pads': None,
-    'Kids\' Tablets & Learning Pads': None,
-    'Language Learning Devices': None,
-    'Musical Toys': None,
-    'Remote-Controlled Educational Bots': None,
-    'Sound and Light Toys': None,
-
-    # PCB Assembly — move to Electrical & Electronics
-    'Box Build Assembly': None,
-    'Conformal Coating Services': None,
-    'Custom Electronic Assembly Services': None,
-    'High Volume PCB Assembly': None,
-    'Mixed Technology Assembly': None,
-    'PCB Soldering Services': None,
-    'PCBA Testing & Quality Control': None,
-    'Prototype PCB Assembly': None,
-    'Reflow Soldering Services': None,
-    'Surface Mount Technology (SMT) Assembly': None,
-    'Through-Hole Assembly Services': None,
-    'Turnkey PCB Assembly Services': None,
-    'Wave Soldering Services': None,
-    'X-Ray Inspection For PCBAs': None,
-
-    # Misc wrong
-    'Barcode Labels For Waste Bags': None,  # → Packaging & Printing
-    'Barcode & RFID Tagging Systems': None,  # → Packaging & Printing
-    'Ink Supplies': None,  # → Packaging & Printing
-    'Lighting Design Consultants': None,  # → Services & Support
-    'Operator Training Programs': None,  # → Services & Support
 }
 
-# For products with None — their correct destination
 FIX_C_PRODUCT_CATEGORY_DEST = {
-    'Augmented Reality (AR) Toys': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Baby Monitors': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Digital Flashcards': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Electronic Board Games': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Electronic Building Blocks': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Electronic Drawing Pads': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Kids\' Tablets & Learning Pads': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Language Learning Devices': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Musical Toys': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Remote-Controlled Educational Bots': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
-    'Sound and Light Toys': ('Home & Lifestyle', 'Children\'s Play Equipment & Toys'),
+    'Augmented Reality (AR) Toys': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Baby Monitors': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Digital Flashcards': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Electronic Board Games': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Electronic Building Blocks': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Electronic Drawing Pads': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    "Kids' Tablets & Learning Pads": ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Language Learning Devices': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Musical Toys': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Remote-Controlled Educational Bots': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
+    'Sound and Light Toys': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
     'Box Build Assembly': ('Electrical & Electronics', 'PCB & Electronic Components'),
     'Conformal Coating Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
     'Custom Electronic Assembly Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
@@ -352,17 +303,17 @@ FIX_C_PRODUCT_CATEGORY_DEST = {
 # FIX D — Rename invalid software subcategories
 # ============================================================
 FIX_D_SUBCATEGORY_RENAME = {
-    'Electronic Components': 'Industry-Specific Software',   # Music Production Software
-    'Fleet Management Solutions': 'Industry-Specific Software',  # Fleet Software Integrations
-    'Medical Consumables': 'Healthcare IT Software',              # Ambulance Fleet Mgmt
-    'Packaging Materials': 'Industry-Specific Software',          # Barcode Label Design Software
+    'Electronic Components': 'Industry-Specific Software',
+    'Fleet Management Solutions': 'Industry-Specific Software',
+    'Medical Consumables': 'Healthcare IT Software',
+    'Packaging Materials': 'Industry-Specific Software',
     'Retail Point of Sale (POS) Software': 'CRM & Sales Automation Software',
     'Healthcare IT Solutions': 'Healthcare IT Software',
     'Embedded Systems Development': 'Industry-Specific Software',
 }
 
 # ============================================================
-# FIX E — Sports construction → correct categories
+# FIX E — Sports construction to correct categories
 # ============================================================
 FIX_E_SPORTS_CONSTRUCTION = {
     'Badminton Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
@@ -380,9 +331,6 @@ FIX_E_SPORTS_CONSTRUCTION = {
     'Gym And Fitness Center Setup': ('Services & Support', 'Engineering & Technical Services'),
 }
 
-# ============================================================
-# SOFTWARE DETECTION (refined)
-# ============================================================
 NON_SOFTWARE_CATEGORIES = {
     'Apparel & Fashion', 'Agriculture & Food Products', 'Agriculture & Farming',
     'Food & Beverage', 'Machinery & Equipment', 'Chemicals & Raw Materials',
@@ -420,109 +368,104 @@ def run():
     if is_completed('phase5'):
         return
 
-    logger.info('Starting Phase 5 — Validator v4')
+    logger.info('Starting Phase 5 — Validator v5 (Final)')
 
     input_path = os.path.join(PHASE4_OUTPUT_DIR, 'normalized.csv')
     if not os.path.exists(input_path):
         raise FileNotFoundError(f'Phase 4 output not found: {input_path}')
 
     df = pd.read_csv(input_path)
-    # Drop attributes column if present — not needed yet
     if 'attributes' in df.columns:
         df = df.drop(columns=['attributes'])
 
     initial = len(df)
     logger.info(f'Input rows: {initial}')
 
-    # ── FIX A: Redistribute Agriculture & Food Products leftover ─
+    # ── FIX A ───────────────────────────────────────────────────
     afp_mask = df['category'] == 'Agriculture & Food Products'
-    afp_count = afp_mask.sum()
-    logger.info(f'Fix A: Processing {afp_count} Agriculture & Food Products leftover rows')
-
+    logger.info(f'Fix A: Processing {afp_mask.sum()} Agriculture & Food Products rows')
     rows_to_delete = []
     for idx, row in df[afp_mask].iterrows():
         sub = row['subcategory']
-        if sub not in FIX_A_REMAP:
-            # Default — merge into Agriculture & Farming
-            df.at[idx, 'category'] = 'Agriculture & Farming'
-            continue
-        dest = FIX_A_REMAP[sub]
+        dest = FIX_A_REMAP.get(sub)
         if dest is None:
             rows_to_delete.append(idx)
         else:
             df.at[idx, 'category'] = dest[0]
             df.at[idx, 'subcategory'] = dest[1]
-
     if rows_to_delete:
         df = df.drop(index=rows_to_delete)
-        logger.info(f'Fix A: Deleted {len(rows_to_delete)} Excess Inventory rows')
-    logger.info(f'Fix A: Agriculture & Food Products category eliminated')
+    logger.info(f'Fix A: Done. Deleted {len(rows_to_delete)} Excess Inventory rows')
 
-    # ── FIX B: Remove Energy & Power — remap 3 products ─────────
+    # ── FIX B ───────────────────────────────────────────────────
     energy_mask = df['category'] == 'Energy & Power'
-    energy_count = energy_mask.sum()
-    logger.info(f'Fix B: Remapping {energy_count} Energy & Power products')
+    logger.info(f'Fix B: Remapping {energy_mask.sum()} Energy & Power products')
     for idx, row in df[energy_mask].iterrows():
         prod = row['product_category']
-        if prod in FIX_B_ENERGY_REMAP:
-            new_cat, new_sub = FIX_B_ENERGY_REMAP[prod]
-            df.at[idx, 'category'] = new_cat
-            df.at[idx, 'subcategory'] = new_sub
-        else:
-            df.at[idx, 'category'] = 'Electrical & Electronics'
-            df.at[idx, 'subcategory'] = 'Renewable Energy Equipment'
-    logger.info('Fix B: Energy & Power category eliminated')
+        new_cat, new_sub = FIX_B_ENERGY_REMAP.get(
+            prod, ('Electrical & Electronics', 'Renewable Energy Equipment'))
+        df.at[idx, 'category'] = new_cat
+        df.at[idx, 'subcategory'] = new_sub
+    logger.info('Fix B: Energy & Power eliminated')
 
-    # ── FIX C: Reclassify ERP overload ──────────────────────────
+    # ── FIX C ───────────────────────────────────────────────────
     erp_mask = (
         (df['category'] == 'Software & IT Solutions') &
         (df['subcategory'] == 'ERP & Business Management Software')
     )
-    erp_count = erp_mask.sum()
-    logger.info(f'Fix C: Reclassifying {erp_count} ERP overload products')
-
-    rows_to_update = []
+    logger.info(f'Fix C: Reclassifying {erp_mask.sum()} ERP overload products')
     for idx, row in df[erp_mask].iterrows():
         prod = row['product_category']
         if prod in FIX_C_PRODUCT_SUBCATEGORY:
             new_sub = FIX_C_PRODUCT_SUBCATEGORY[prod]
-            if new_sub is None:
-                # Move to different category entirely
-                if prod in FIX_C_PRODUCT_CATEGORY_DEST:
-                    new_cat, new_sub2 = FIX_C_PRODUCT_CATEGORY_DEST[prod]
-                    df.at[idx, 'category'] = new_cat
-                    df.at[idx, 'subcategory'] = new_sub2
-            else:
+            if new_sub is None and prod in FIX_C_PRODUCT_CATEGORY_DEST:
+                new_cat, new_sub2 = FIX_C_PRODUCT_CATEGORY_DEST[prod]
+                df.at[idx, 'category'] = new_cat
+                df.at[idx, 'subcategory'] = new_sub2
+            elif new_sub:
                 df.at[idx, 'subcategory'] = new_sub
-    logger.info('Fix C: ERP overload reclassified')
+    logger.info('Fix C: Done')
 
-    # ── FIX D: Rename invalid software subcategories ─────────────
+    # ── FIX D ───────────────────────────────────────────────────
     sw_mask = df['category'] == 'Software & IT Solutions'
     for idx, row in df[sw_mask].iterrows():
-        sub = row['subcategory']
-        if sub in FIX_D_SUBCATEGORY_RENAME:
-            df.at[idx, 'subcategory'] = FIX_D_SUBCATEGORY_RENAME[sub]
-    logger.info('Fix D: Invalid software subcategory names corrected')
+        if row['subcategory'] in FIX_D_SUBCATEGORY_RENAME:
+            df.at[idx, 'subcategory'] = FIX_D_SUBCATEGORY_RENAME[row['subcategory']]
+    logger.info('Fix D: Invalid software subcategories renamed')
 
-    # ── FIX E: Move sports construction to correct categories ─────
+    # ── FIX E ───────────────────────────────────────────────────
     sports_eng_mask = (
         (df['category'] == 'Sports & Entertainment') &
         (df['subcategory'] == 'Engineering & Technical Services')
     )
-    sports_eng_count = sports_eng_mask.sum()
-    logger.info(f'Fix E: Remapping {sports_eng_count} sports construction products')
+    logger.info(f'Fix E: Moving {sports_eng_mask.sum()} sports construction products')
     for idx, row in df[sports_eng_mask].iterrows():
         prod = row['product_category']
-        if prod in FIX_E_SPORTS_CONSTRUCTION:
-            new_cat, new_sub = FIX_E_SPORTS_CONSTRUCTION[prod]
-            df.at[idx, 'category'] = new_cat
-            df.at[idx, 'subcategory'] = new_sub
-        else:
-            df.at[idx, 'category'] = 'Construction & Infrastructure'
-            df.at[idx, 'subcategory'] = 'Sports & Recreational Infrastructure'
-    logger.info('Fix E: Sports construction products moved')
+        new_cat, new_sub = FIX_E_SPORTS_CONSTRUCTION.get(
+            prod, ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'))
+        df.at[idx, 'category'] = new_cat
+        df.at[idx, 'subcategory'] = new_sub
+    logger.info('Fix E: Done')
 
-    # ── STANDARD DEDUPLICATION ───────────────────────────────────
+    # ── FOOD & BEVERAGE RE-SPLIT (after Phase 4 merge) ──────────
+    # Phase 4 synonym merge collapsed Food & Beverage back into Agriculture & Farming
+    # Re-establish the split based on subcategory names
+    agri_mask = df['category'].isin(['Agriculture & Farming', 'Agriculture & Food Products'])
+    food_sub_mask = df['subcategory'].isin(FOOD_BEVERAGE_SUBCATEGORIES)
+    food_reclassify_mask = agri_mask & food_sub_mask
+    food_reclassify_count = food_reclassify_mask.sum()
+    if food_reclassify_count:
+        logger.info(f'Food/Agri split: Moving {food_reclassify_count} products to Food & Beverage')
+        df.loc[food_reclassify_mask, 'category'] = 'Food & Beverage'
+
+    agri_sub_mask = df['subcategory'].isin(AGRICULTURE_FARMING_SUBCATEGORIES)
+    agri_reclassify_mask = (df['category'] == 'Food & Beverage') & agri_sub_mask
+    agri_reclassify_count = agri_reclassify_mask.sum()
+    if agri_reclassify_count:
+        logger.info(f'Food/Agri split: Moving {agri_reclassify_count} products to Agriculture & Farming')
+        df.loc[agri_reclassify_mask, 'category'] = 'Agriculture & Farming'
+
+    # ── DEDUPLICATION ────────────────────────────────────────────
     before = len(df)
     df = df.drop_duplicates()
     logger.info(f'Exact duplicates removed: {before - len(df)}')
@@ -562,37 +505,47 @@ def run():
     cat_count = df['category'].nunique()
     sub_count = df['subcategory'].nunique()
 
-    # Final validation checks
-    remaining_afp = len(df[df['category'] == 'Agriculture & Food Products'])
-    remaining_energy = len(df[df['category'] == 'Energy & Power'])
-    sw_subs = df[df['category'] == 'Software & IT Solutions']['subcategory'].value_counts()
-    sports_eng = len(df[(df['category'] == 'Sports & Entertainment') &
-                        (df['subcategory'] == 'Engineering & Technical Services')])
-    erp_remaining = len(df[(df['category'] == 'Software & IT Solutions') &
-                           (df['subcategory'] == 'ERP & Business Management Software')])
+    # ── VALIDATION REPORT ────────────────────────────────────────
+    afp_remaining = len(df[df['category'] == 'Agriculture & Food Products'])
+    energy_remaining = len(df[df['category'] == 'Energy & Power'])
+    erp_remaining = len(df[
+        (df['category'] == 'Software & IT Solutions') &
+        (df['subcategory'] == 'ERP & Business Management Software')
+    ])
+    sports_eng_remaining = len(df[
+        (df['category'] == 'Sports & Entertainment') &
+        (df['subcategory'] == 'Engineering & Technical Services')
+    ])
+    food_bev_count = len(df[df['category'] == 'Food & Beverage'])
+    agri_count = len(df[df['category'] == 'Agriculture & Farming'])
 
-    logger.info(f'\n{"="*50}')
+    logger.info(f'\n{"="*55}')
     logger.info(f'VALIDATION RESULTS:')
-    logger.info(f'  Agriculture & Food Products leftover: {remaining_afp} (target: 0)')
-    logger.info(f'  Energy & Power remaining: {remaining_energy} (target: 0)')
-    logger.info(f'  ERP overload remaining: {erp_remaining} (target: <50)')
-    logger.info(f'  Sports Engineering & Technical Services: {sports_eng} (target: 0)')
-    logger.info(f'{"="*50}')
+    logger.info(f'  Fix A — Agriculture & Food Products leftover: {afp_remaining} (target: 0)')
+    logger.info(f'  Fix B — Energy & Power remaining: {energy_remaining} (target: 0)')
+    logger.info(f'  Fix C — ERP overload remaining: {erp_remaining} (target: <50)')
+    logger.info(f'  Fix E — Sports Eng & Technical: {sports_eng_remaining} (target: 0)')
+    logger.info(f'  Food & Beverage: {food_bev_count} products')
+    logger.info(f'  Agriculture & Farming: {agri_count} products')
+    logger.info(f'{"="*55}')
 
-    logger.info(f'\nSoftware & IT Solutions subcategories:\n{sw_subs.to_string()}')
+    sw_subs = df[df['category'] == 'Software & IT Solutions']['subcategory'].value_counts()
+    logger.info(f'\nSoftware & IT Solutions:\n{sw_subs.to_string()}')
     logger.info(f'\nCategory distribution:\n{df["category"].value_counts().to_string()}')
 
     set_metric('final_products', final)
     set_metric('final_subcategories', sub_count)
     set_metric('final_categories', cat_count)
-    set_metric('fix_a_afp_remaining', remaining_afp)
-    set_metric('fix_b_energy_remaining', remaining_energy)
+    set_metric('food_beverage_products', food_bev_count)
+    set_metric('agriculture_farming_products', agri_count)
+    set_metric('fix_a_remaining', afp_remaining)
+    set_metric('fix_b_remaining', energy_remaining)
     set_metric('fix_c_erp_remaining', erp_remaining)
-    set_metric('fix_e_sports_eng_remaining', sports_eng)
+    set_metric('fix_e_remaining', sports_eng_remaining)
 
     output_path = os.path.join(PHASE5_OUTPUT_DIR, 'final_taxonomy.csv')
     df.to_csv(output_path, index=False, encoding='utf-8')
-    logger.info(f'Final taxonomy: {output_path} ({final} rows | {sub_count} subcategories | {cat_count} categories)')
+    logger.info(f'Output: {output_path} ({final} rows | {sub_count} subcategories | {cat_count} categories)')
 
     save_metrics()
     mark_completed('phase5')
