@@ -395,6 +395,40 @@ def is_software(name: str) -> bool:
     return any(f' {kw} ' in padded or padded.strip().endswith(kw)
                for kw in SOFTWARE_KEYWORDS)
 
+# ── PATCH v8.1 ADDITIONS ──────────────────────────────────────
+
+# Software subcategories that are hardware/services — move out
+SW_HARDWARE_SUBS = {
+    'Retail Point of Sale (POS) Systems': ('Electrical & Electronics', 'Computers, Laptops & Peripherals'),
+    'Electronic Assembly Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
+    'Computers, Laptops & Peripherals': ('Electrical & Electronics', 'Computers, Laptops & Peripherals'),
+    'Electronic Component Repair & Maintenance Services': ('Services & Support', 'IT Support & Managed Services'),
+    'Electronic Design & Prototyping Services': ('Services & Support', 'Engineering & Technical Services'),
+    'Gaming Software & Platforms': ('Software & IT Solutions', 'Creative & Game Development Software'),
+    'Mental Health & Wellness Applications': ('Software & IT Solutions', 'Healthcare IT Software'),
+    'Enterprise Resource Planning (ERP) Systems': ('Software & IT Solutions', 'ERP & Business Management Software'),
+}
+
+# Food Additives that are industrial chemicals → Chemicals & Raw Materials
+FOOD_ADDITIVES_CHEMICALS = {
+    'Acidity Regulators', 'Acidulants (Citric Acid, Malic Acid, Tartaric Acid)',
+    'Amino Acids (L-Lysine, L-Glutamine)', 'Anti-foaming Agents',
+    'Anticaking Agents (Silicon Dioxide, Calcium Silicate)',
+    'Antioxidants (BHA, BHT, Tocopherols)', 'Ascorbic Acid (Vitamin C)',
+    'Aspartame', 'Calcium Propionate', 'Carrageenan', 'Citric Acid',
+    'Emulsifiers (Lecithin, Mono & Diglycerides)', 'Food Grade Acids',
+    'Gelling Agents (Pectin, Agar, Carrageenan)', 'Guar Gum', 'Lecithin',
+    'Potassium Sorbate', 'Sodium Benzoate', 'Sodium Citrate',
+    'Sodium Erythorbate', 'Sodium Propionate', 'Sorbic Acid',
+    'Sucralose', 'Tartaric Acid', 'Xanthan Gum',
+}
+
+# Agriculture subcategories that belong in Food & Beverage
+AGRI_TO_FOOD_SUBCATS = {
+    'Canned & Preserved Foods',
+    'Frozen Vegetables & Fruits',
+}
+
 def run():
     if is_completed('phase5'):
         return
@@ -452,6 +486,35 @@ def run():
     if agri_food_count:
         df.loc[agri_food_mask, 'category'] = 'Food & Beverage'
         logger.info(f'Fix 1: Moved {agri_food_count} food subcategory products from Agriculture to Food & Beverage')
+
+    # ── Patch 1: Move canned/frozen from Agriculture to Food & Beverage
+    agri_food2_mask = (
+        (df['category'] == 'Agriculture & Farming') &
+        (df['subcategory'].isin(AGRI_TO_FOOD_SUBCATS))
+    )
+    df.loc[agri_food2_mask, 'category'] = 'Food & Beverage'
+    logger.info(f'Patch 1: Moved {agri_food2_mask.sum()} canned/frozen products to Food & Beverage')
+
+    # ── Patch 2: Move chemical Food Additives to Chemicals & Raw Materials
+    fa_chem_mask = (
+        (df['category'] == 'Agriculture & Farming') &
+        (df['subcategory'] == 'Food Additives & Preservatives') &
+        (df['product_category'].isin(FOOD_ADDITIVES_CHEMICALS))
+    )
+    df.loc[fa_chem_mask, 'category'] = 'Chemicals & Raw Materials'
+    df.loc[fa_chem_mask, 'subcategory'] = 'Food Grade Chemicals & Additives'
+    logger.info(f'Patch 2: Moved {fa_chem_mask.sum()} chemical food additives to Chemicals & Raw Materials')
+
+    # ── Patch 3: Move software hardware/service subcategories out
+    sw_hw_fixed = 0
+    sw_mask2 = df['category'] == 'Software & IT Solutions'
+    for idx, row in df[sw_mask2].iterrows():
+        if row['subcategory'] in SW_HARDWARE_SUBS:
+            new_cat, new_sub = SW_HARDWARE_SUBS[row['subcategory']]
+            df.at[idx, 'category'] = new_cat
+            df.at[idx, 'subcategory'] = new_sub
+            sw_hw_fixed += 1
+    logger.info(f'Patch 3: {sw_hw_fixed} software hardware/service products moved to correct categories')
 
     # ── Fix 2: Garment Manufacturing (OEM/ODM) → correct apparel subcategories
     gm_mask = df['subcategory'] == 'Garment Manufacturing (OEM/ODM)'
@@ -629,6 +692,14 @@ def run():
     logger.info(f'  Fix 2 — Garment Manufacturing (OEM/ODM) remaining: {gm_remaining} (target: 0)')
     logger.info(f'  Fix 3 — Industry-Specific Software remaining: {iss_remaining} (target: <50)')
     logger.info(f'  Fix 4 — Industrial Tools remaining: {it_remaining} (was 461)')
+
+    # Patch validations
+    fa_remaining = len(df[(df['category']=='Agriculture & Farming') & 
+                          (df['subcategory']=='Food Additives & Preservatives')])
+    sw_hw_remaining = len(df[(df['category']=='Software & IT Solutions') & 
+                              (df['subcategory'].isin(SW_HARDWARE_SUBS.keys()))])
+    logger.info(f'  Patch 1/2 — Food Additives remaining: {fa_remaining} (was 474)')
+    logger.info(f'  Patch 3 — SW hardware subcats remaining: {sw_hw_remaining} (target: 0)')
     logger.info(f'  Food & Beverage: {food_bev} products')
     logger.info(f'  Agriculture & Farming: {agri} products')
     logger.info(f'{"="*55}')
