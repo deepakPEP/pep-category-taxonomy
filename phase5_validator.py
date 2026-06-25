@@ -26,14 +26,19 @@ FOOD_PRODUCT_KEYWORDS = [
     'edible oil', 'cooking oil', 'sunflower oil', 'mustard oil',
     'coconut oil', 'groundnut oil', 'olive oil', 'sesame oil',
     'rice bran oil', 'soybean oil', 'palm oil', 'canola oil',
+    'avocado oil', 'camelina oil',
     'frozen food', 'frozen meal', 'frozen vegetable', 'frozen fruit',
-    'frozen chicken', 'frozen fish', 'frozen prawn',
+    'frozen chicken', 'frozen fish', 'frozen prawn', 'frozen biryani',
+    'frozen breakfast', 'frozen indian', 'frozen curry',
     'instant food', 'ready to eat', 'ready-to-eat', 'rte food',
-    'canned food', 'preserved food',
+    'canned food', 'preserved food', 'canned ready meal',
+    'diabetic-friendly instant',
     'chicken cut', 'fresh chicken', 'mutton', 'lamb cut', 'fresh fish',
-    'prawn', 'shrimp', 'seafood', 'tuna', 'salmon',
+    'prawn', 'shrimp', 'seafood', 'tuna', 'salmon', 'broiler chicken',
+    'boneless meat', 'horeca pack',
     'cigarette', 'cigar', 'tobacco product',
     'baby food', 'infant formula', 'baby cereal', 'baby puree',
+    'electrolyte mix for infant', 'prebiotic', 'probiotic powder',
     'protein powder', 'mass gainer', 'pre-workout supplement',
     'bcaa supplement', 'creatine supplement', 'sports drink',
     'electrolyte drink for athlete',
@@ -43,36 +48,58 @@ FOOD_PRODUCT_KEYWORDS = [
     'rajma', 'moong', 'toor dal', 'urad dal',
     'turmeric', 'black pepper', 'cumin', 'coriander', 'cardamom',
     'cinnamon', 'clove', 'ginger powder', 'chilli powder',
-    'masala', 'spice blend',
+    'masala', 'spice blend', 'kokum', 'vitamin-infused water',
+    'chewing gum', 'bubble gum', 'danish', 'donut', 'eclair',
+    'family pack snack', 'khara boondi', 'mixture snack',
+    'bulk can', 'cooking oil bulk',
 ]
 
 FOOD_SUBCATEGORY_MAP = [
     (['tea', 'coffee', 'beverage', 'drink', 'lassi', 'buttermilk',
-      'coconut water', 'energy drink', 'smoothie', 'shake'], 'Beverages (Tea, Coffee, Juices)'),
+      'coconut water', 'energy drink', 'smoothie', 'shake',
+      'kokum', 'vitamin-infused water'], 'Beverages (Tea, Coffee, Juices)'),
     (['milk', 'paneer', 'ghee', 'butter', 'cheese', 'curd', 'yogurt',
       'cream', 'dairy', 'whey protein'], 'Dairy Products & Alternatives'),
     (['bread', 'cake', 'biscuit', 'cookie', 'chocolate', 'candy', 'sweet',
       'mithai', 'laddoo', 'barfi', 'halwa', 'gulab jamun', 'rasgulla',
-      'confectionery', 'pastry', 'muffin', 'cupcake', 'bakery', 'toffee'], 'Bakery & Confectionery Products'),
+      'confectionery', 'pastry', 'muffin', 'cupcake', 'bakery', 'toffee',
+      'chewing gum', 'bubble gum', 'danish', 'donut', 'eclair'], 'Bakery & Confectionery Products'),
     (['snack', 'namkeen', 'bhujia', 'chiwda', 'popcorn', 'chips',
-      'farsan', 'gathiya', 'makhana', 'peanut snack'], 'Snacks & Namkeens'),
+      'farsan', 'gathiya', 'makhana', 'peanut snack',
+      'family pack snack', 'khara boondi', 'mixture snack'], 'Snacks & Namkeens'),
     (['pickle', 'ketchup', 'chutney', 'jam', 'sauce', 'paste',
       'mayonnaise', 'vinegar', 'mustard', 'dressing', 'achar'], 'Condiments & Sauces'),
     (['edible oil', 'cooking oil', 'sunflower oil', 'mustard oil',
       'coconut oil', 'groundnut oil', 'olive oil', 'sesame oil',
-      'rice bran oil', 'soybean oil', 'palm oil', 'canola oil'], 'Edible Oils & Fats'),
+      'rice bran oil', 'soybean oil', 'palm oil', 'canola oil',
+      'avocado oil', 'camelina oil', 'bulk can'], 'Edible Oils & Fats'),
     (['frozen food', 'frozen meal', 'frozen vegetable', 'frozen fruit',
-      'frozen chicken', 'frozen fish', 'frozen prawn'], 'Frozen & Processed Foods'),
+      'frozen chicken', 'frozen fish', 'frozen prawn', 'frozen biryani',
+      'frozen breakfast', 'frozen indian', 'frozen curry'], 'Frozen & Processed Foods'),
     (['instant food', 'ready to eat', 'ready-to-eat', 'rte food',
-      'canned food', 'preserved food'], 'Ready-to-Eat & Instant Foods'),
+      'canned food', 'preserved food', 'canned ready meal',
+      'diabetic-friendly instant'], 'Ready-to-Eat & Instant Foods'),
     (['chicken cut', 'fresh chicken', 'mutton', 'lamb cut', 'fresh fish',
-      'prawn', 'shrimp', 'seafood', 'tuna', 'salmon'], 'Meat, Poultry & Seafood'),
+      'prawn', 'shrimp', 'seafood', 'tuna', 'salmon', 'broiler chicken',
+      'boneless meat', 'horeca pack'], 'Meat, Poultry & Seafood'),
     (['cigarette', 'cigar', 'tobacco product'], 'Tobacco & Smoking Products'),
-    (['baby food', 'infant formula', 'baby cereal', 'baby puree'], 'Baby Food Products'),
+    (['baby food', 'infant formula', 'baby cereal', 'baby puree',
+      'electrolyte mix for infant', 'prebiotic', 'probiotic powder',
+      'export-ready baby nutrition'], 'Baby Food Products'),
     (['protein powder', 'mass gainer', 'pre-workout supplement',
       'bcaa supplement', 'creatine supplement', 'sports drink',
       'electrolyte drink for athlete'], 'Sports Nutrition Products'),
 ]
+
+# Food subcategories that should be in Food & Beverage not Agriculture
+FOOD_SUBCATEGORIES_IN_AGRI = {
+    'Baby Food Products', 'Bakery & Confectionery Products',
+    'Beverages (Tea, Coffee, Juices)', 'Edible Oils & Fats',
+    'Frozen & Processed Foods', 'Meat, Poultry & Seafood',
+    'Ready-to-Eat & Instant Foods', 'Snacks & Namkeens',
+    'Condiments & Sauces', 'Dairy Products & Alternatives',
+    'Tobacco & Smoking Products', 'Sports Nutrition Products',
+}
 
 def get_food_subcategory(product_name: str) -> str:
     lower = product_name.lower()
@@ -86,160 +113,236 @@ def is_food_product(product_name: str) -> bool:
     return any(kw in lower for kw in FOOD_PRODUCT_KEYWORDS)
 
 # ============================================================
-# FIX A — Agriculture & Food Products leftover
+# GARMENT MANUFACTURING (OEM/ODM) REMAP
+# Map each product to correct Apparel subcategory
 # ============================================================
-FIX_A_REMAP = {
-    'Baking Ingredients': ('Food & Beverage', 'Bakery & Confectionery Products'),
-    'Certification Services': ('Services & Support', 'Certification & Compliance Services'),
-    'Excess Inventory': None,
-    'Food Grade Packaging': ('Packaging & Printing', 'Food Grade Packaging'),
-    'Food Processing Machinery': ('Machinery & Equipment', 'Food Processing Machinery'),
-    'Gardening Tools': ('Tools & Hardware', 'Gardening Tools'),
-    'Manufacturing Services': ('Services & Support', 'Contract Manufacturing Services'),
-    'Poultry Farming Services': ('Services & Support', 'Agricultural & Farming Services'),
-    'Sports Nutrition & Supplements': ('Health & Personal Care', 'Health Supplements & Vitamins'),
-    'Tobacco & Smoking Products': ('Food & Beverage', 'Tobacco & Smoking Products'),
-    'Training & Capacity Building': ('Services & Support', 'Training & Skill Development'),
+GARMENT_OEM_REMAP = {
+    'Infant & Toddler Apparel ODM': 'Kids & Baby Wear',
+    'Jeans & Bottoms Manufacturers': 'Men\'s Wear',
+    'Kids\' Clothing OEM': 'Kids & Baby Wear',
+    'Kids\' Ethnic Wear Producers': 'Kids & Baby Wear',
+    'Men\'s Activewear Manufacturers': 'Sportswear & Athletic Apparel',
+    'Men\'s Casual Wear OEM': 'Men\'s Wear',
+    'Men\'s Ethnic Wear OEM': 'Ethnic & Cultural Clothing',
+    'Men\'s Formal Wear ODM': 'Men\'s Wear',
+    'Men\'s Innerwear & Undergarment OEM': 'Men\'s Wear',
+    'Men\'s Outerwear Producers': 'Men\'s Wear',
+    'School Uniform Manufacturers': 'Workwear & Safety Apparel',
+    'Shirts & Blouses ODM': 'T-Shirts, Polos, Shirts',
+    'T-Shirts & Polos OEM': 'T-Shirts, Polos, Shirts',
+    'Women\'s Dresses & Gowns Manufacturers': 'Dresses, Gowns, Skirts',
+    'Women\'s Ethnic Wear ODM': 'Sarees, Kurtis, Salwar Sets',
+    'Women\'s Fashion Wear OEM': 'Women\'s Wear',
+    'Women\'s Lingerie OEM': 'Women\'s Wear',
+    'Women\'s Maternity Wear ODM': 'Women\'s Wear',
+    'Women\'s Sportswear Manufacturers': 'Sportswear & Athletic Apparel',
 }
 
 # ============================================================
-# FIX B — Remove Energy & Power
+# INDUSTRY-SPECIFIC SOFTWARE RECLASSIFICATION
 # ============================================================
-FIX_B_ENERGY_REMAP = {
-    'Biogas Plant Machinery': ('Machinery & Equipment', 'Renewable Energy Machinery'),
-    'Solar Energy Monitoring Systems': ('Software & IT Solutions', 'IoT & Smart Building Software'),
-    'Wind Turbine Commissioning': ('Services & Support', 'Engineering & Technical Services'),
+ISS_HEALTHCARE = {
+    'AI Symptom Checker Integrations', 'AI-Based Diagnosis Support Tools',
+    'AI-Powered Image Diagnostics', 'API Integration Tools for Clinics',
+    'Automated Lab Result Reporting', 'Billing, Invoicing & Insurance Claims Software',
+    'Chatbots for Patient Queries', 'Clinic Management Software',
+    'Clinical Decision Support Systems', 'Cloud-Based Data Storage for Medical Records',
+    'Cloud-Based EHR Systems', 'Cloud-Based Medical Transcription Tools',
+    'Customizable EMR Templates', 'DICOM Image Viewers',
+    'Data Loggers for Medical Transport', 'Diagnostic Software & Scanners',
+    'Digital Consent & EHR Forms', 'E-Prescription Tools',
+    'EHR Mobile Applications', 'Electronic Data Capture (EDC) Services',
+    'HIPAA & GDPR Compliance Tools', 'HIPAA-Compliant Communication Tools',
+    'Healthcare CRM Tools', 'Hospital Information Management Systems (HIMS)',
+    'Inventory Management for Labs & Pharmacies', 'Lab & Diagnostic Data Integration',
+    'Laboratory Information Systems (LIS)', 'Livestock Health Record Software',
+    'Medical Billing Software Solutions', 'Medical Data Backup & Recovery Solutions',
+    'Medical NLP & Data Extraction Tools', 'Mobile Health Engagement Apps',
+    'OPD & IPD Management Tools', 'Online Booking & Scheduling Systems',
+    'PACS (Picture Archiving and Communication Systems)',
+    'Patient Feedback & Survey Platforms', 'Patient Portal Integrations',
+    'Patient Portals & Mobile Apps', 'Patient Registration & Queue Management Systems',
+    'Population Health Management Software', 'Practice Management Systems Integration',
+    'Predictive Health Analytics Tools', 'Radiology Information Systems (RIS)',
+    'Remote Diagnosis Platforms', 'Remote Patient Monitoring Systems',
+    'Secure Cloud Hosting for Medical Data', 'Sleep Coaching Apps & Programs',
+    'Specialty-Specific Telehealth Solutions (Dermatology, Psychiatry)',
+    'Teleconsultation Platforms', 'Telemedicine Software (General Practitioners)',
+    'Video Consultation API Solutions', 'Virtual Waiting Room Software',
+    'White-Label Telehealth Software', 'ePharmacy & Online Ordering Platforms',
+    'AI-Based Diagnosis Support Tools', 'Automated Lab Result Reporting',
+    'Ambulance Fleet Management Software',
+}
+
+ISS_IOT = {
+    'Access Control & Audit Logs', 'Automated Alert & Reporting Tools',
+    'Building Management System (BMS) Integration',
+    'Building Management System (BMS) Panels',
+    'Cloud-Based Cold Chain Monitoring Dashboards',
+    'Cloud-Based Smart Building Platforms', 'Compressor Control Panels',
+    'Custom Automation Software (SaaS)', 'Energy Monitoring Systems for Compressors',
+    'Integrated Facility Dashboards', 'IoT-Based Asset Monitoring Platforms',
+    'IoT-Based Cold Chain Management', 'IoT-Based Farm Management Systems',
+    'IoT-Based Fleet Management Platforms', 'Office IoT Integration Tools',
+    'Personal Alarm Systems', 'Real-Time GPS Trackers with Temperature Sensors',
+    'SCADA Software Licenses', 'SCADA for Compressors',
+    'Smart Building Mobile Apps', 'Workplace Safety Cameras',
+}
+
+ISS_CRM = {
+    'CRM & Sales Automation Tools', 'CRM Software Development',
+    'Email Marketing & Automation Tools',
+    'Email Marketing Software (Mailchimp, Sendinblue)',
+    'Helpdesk & Support Ticketing Systems',
+    'Online Fitness Program Marketplaces', 'POS Integration for Fashion Retail',
+    'Point of Sale (POS) Systems', 'Stock Replenishment & Forecasting Tools',
+    'Buyer Order Tracking Portals',
+}
+
+ISS_HR = {
+    'Attendance & HRMS Software', 'HR & Payroll Management Software',
+    'HRMS & Payroll Integration Services',
+    'Human Resource Management Systems (HRMS)',
+    'Payroll Software Solutions', 'Time & Attendance Management Software',
+}
+
+ISS_CLOUD = {
+    'Accounting & Billing Software Development',
+    'Accounting & Bookkeeping SaaS',
+    'Accounting Software (Tally, QuickBooks, Zoho Books)',
+    'Audit & Documentation Solutions', 'Audit Trail Reports & Record Logs',
+    'Automated Billing & Invoicing Systems',
+    'Biometric Login & Authentication Systems',
+    'Business Intelligence & Analytics Platforms',
+    'Cloud Storage & File Sharing Services', 'Cloud Storage Subscriptions',
+    'Custom Software Development', 'Data Backup & Recovery Solutions',
+    'Data Encryption & Cybersecurity Solutions',
+    'Desktop Application Development', 'Developer Tools (IDE, GitHub, JetBrains)',
+    'Document Management & E-signature Tools',
+    'Electronic Signature Software', 'Email & SMS Reminder Tools',
+    'Embedded Software Development Tools',
+    'Encrypted File Transmission Systems', 'Enterprise Software Solutions',
+    'Facility Management Software', 'ID Card Design Software',
+    'Laptop & Desktop Leasing', 'Office Productivity Software (MS Office, Google Workspace)',
+    'Operating System Licenses (Windows, Linux)',
+    'Order Processing & Fulfillment Systems',
+    'Product Lifecycle Management (PLM) Software',
+    'Project Management & Collaboration Tools',
+    'SaaS Product Development', 'Secure Document Sharing & Workflow Automation',
+    'Smartwatch App Development Services',
+    'Software Development Consulting', 'Software Maintenance & Support',
+    'Speech Recognition AI Tools', 'Training App Development Services',
+    'Video Conferencing Software (Zoom, Teams, Webex)',
+    'Virtual Classrooms & Meeting Rooms', 'Web Application Development',
+    'Website & Landing Page Builders', 'Workflow Automation Software',
+}
+
+ISS_CREATIVE = {
+    'Audio Plugins & Effects', 'DJ Software & Licenses',
+    'Digital Audio Workstations (DAWs)', 'Enterprise VR Platforms',
+    'Music Production Software', 'Retail & E-commerce VR Solutions',
+    'Streaming Software Licenses', 'VR App Development Services',
+    'VR Data Analytics Tools', 'VR Game Titles & Software',
+    'VR Integration Services', 'AR-based Educational Games',
+}
+
+ISS_FLEET = {
+    'API Integration for Fleet Management', 'Digital Twin Services For Vehicles',
+    'Digital Vehicle Inspection Software', 'Driver Behavior Monitoring Systems',
+    'EV Charging Software & Platforms', 'Electric Vehicle (Ev) Design',
+    'Fleet Compliance & Documentation Tools', 'Fleet Data Reporting & Insights',
+    'Fleet Lifecycle Management Software', 'Fleet Maintenance Scheduling Tools',
+    'Fleet Management Software', 'Fleet Performance Analytics',
+    'Fleet Route Optimization Tools', 'Fleet Tracking Software',
+    'Fuel Tanks & Fuel Management Systems', 'Gps Tracking Software',
+    'Mobile Apps for Fleet Control', 'OEM Fleet Software Integrations',
+    'Telematics Solutions', 'Ux/UI Design For Infotainment Systems',
+    'Vehicle Diagnostic Software', 'Vehicle Dispatch Software',
+    'Vr/Ar-Based Auto Design Tools', '3D Cad Design For Vehicles',
+    '3D Vehicle Rendering Services', 'Automobile Design Software Solutions',
+    'Automotive Cfd/cae Simulation',
+}
+
+ISS_ENGINEERING = {
+    '3D Imaging & Reconstruction Tools', '3D Slicing Software',
+    '3D Virtual Prototyping', 'AI-based Predictive Maintenance Tools',
+    'API Development & Integration', 'Automation Software & Platforms',
+    'Barcode & QR Code-Based Sample Tracking', 'Barcode & RFID Tagging Systems',
+    'Barcode Label Design Software', 'Batching Software & Reporting Tools',
+    'Build Preparation Software', 'CAD & 3D Design Software (AutoCAD, SolidWorks)',
+    'CNC Cutting Software & Controllers', 'Casting Simulation Software',
+    'Design Software (Adobe CC, CorelDRAW)', 'ERP Software Development',
+    'ERP Software Licenses', 'Export Documentation & Compliance Software',
+    'Label Design Software', 'Programming Cables & Software',
+    'Robotic Simulation Software', 'STL Editing Tools',
+    'WHO PQS Certified Equipment', 'Wearable Device Repair Services',
+    'Antivirus & Security Software', 'AI-Based Crop Advisory System Setup',
+    'Agri ERP Software Implementation', 'Apparel Inventory Tracking Software',
+    'Dealership Management Software', 'Farm Automation Planning',
+    'IoT-Based Farm Management Systems', 'Multi-Warehouse Apparel Management Software',
+    'Textile CAD/CAM Systems',
+}
+
+ISS_APPAREL_SW = {
+    'Apparel Inventory Tracking Software': 'ERP & Business Management Software',
+    'Multi-Warehouse Apparel Management Software': 'ERP & Business Management Software',
+    'Textile CAD/CAM Systems': 'ERP & Business Management Software',
+    'Buyer Order Tracking Portals': 'CRM & Sales Automation Software',
 }
 
 # ============================================================
-# FIX C — ERP overload reclassification
+# CONSTRUCTION ENGINEERING REMAP
 # ============================================================
-FIX_C_PRODUCT_SUBCATEGORY = {
-    'AR Game Development Platforms': 'Creative & Game Development Software',
-    'AR/VR Multiplayer Game Platforms': 'Creative & Game Development Software',
-    'Custom VR Environments': 'Creative & Game Development Software',
-    'DJ Software & Licenses': 'Creative & Game Development Software',
-    'Enterprise VR Platforms': 'Creative & Game Development Software',
-    'Music Production Software': 'Creative & Game Development Software',
-    'Online Gaming Subscription Cards': 'Creative & Game Development Software',
-    'Retail & E-commerce VR Solutions': 'Creative & Game Development Software',
-    'Streaming Software Licenses': 'Creative & Game Development Software',
-    'VR App Development Services': 'Creative & Game Development Software',
-    'VR Content Creation Software': 'Creative & Game Development Software',
-    'VR Data Analytics Tools': 'Creative & Game Development Software',
-    'VR Development Boards & SDKs': 'Creative & Game Development Software',
-    'VR Game Titles & Software': 'Creative & Game Development Software',
-    'VR Integration Services': 'Creative & Game Development Software',
-    'VR Streaming Platforms': 'Creative & Game Development Software',
-    'VR in Real Estate & Architecture': 'Creative & Game Development Software',
-    'Virtual Esports Solutions': 'Creative & Game Development Software',
-    'Virtual Reality Fitness Training': 'Creative & Game Development Software',
-    'Virtual Reality for Education': 'Creative & Game Development Software',
-    'Air Quality Monitoring Devices': 'IoT & Smart Building Software',
-    'App-Based Monitoring Systems': 'IoT & Smart Building Software',
-    'Battery Management Systems (BMS)': 'IoT & Smart Building Software',
-    'Building Management System (BMS) Panels': 'IoT & Smart Building Software',
-    'Cloud-Based Smart Building Platforms': 'IoT & Smart Building Software',
-    'Cold Chain Temperature Monitoring Systems': 'IoT & Smart Building Software',
-    'IoT Gateways & Controllers': 'IoT & Smart Building Software',
-    'IoT Solutions For Smart Farming': 'IoT & Smart Building Software',
-    'IoT-Based Cold Chain Management': 'IoT & Smart Building Software',
-    'Smart Building Mobile Apps': 'IoT & Smart Building Software',
-    'Smart CCTV Monitoring Systems': 'IoT & Smart Building Software',
-    'Smart Grid Controllers': 'IoT & Smart Building Software',
-    'Smart Lighting Control Systems': 'IoT & Smart Building Software',
-    'Smart Meters (Water, Electricity, Gas)': 'IoT & Smart Building Software',
-    'SCADA Software Licenses': 'IoT & Smart Building Software',
-    'HVAC Automation Controls': 'IoT & Smart Building Software',
-    'CRM & Sales Automation Tools': 'CRM & Sales Automation Software',
-    'Customer Relationship Management (CRM) Software': 'CRM & Sales Automation Software',
-    'Email Marketing & Automation Tools': 'CRM & Sales Automation Software',
-    'Helpdesk & Support Ticketing Systems': 'CRM & Sales Automation Software',
-    'Point of Sale (POS) Systems': 'CRM & Sales Automation Software',
-    'Sales Analytics & Reporting Tools': 'CRM & Sales Automation Software',
-    'Attendance & HRMS Software': 'HR & Payroll Software',
-    'Biometric Attendance Systems': 'HR & Payroll Software',
-    'HR & Payroll Management Software': 'HR & Payroll Software',
-    'Payroll Software Solutions': 'HR & Payroll Software',
-    'Time & Attendance Management Software': 'HR & Payroll Software',
-    'Hospital Information Management Systems (HIMS)': 'Healthcare IT Software',
-    'Medical Billing Software Solutions': 'Healthcare IT Software',
-    'Cloud Storage & File Sharing Services': 'Cloud & Productivity Software',
-    'Office Productivity Software (MS Office, Google Workspace)': 'Cloud & Productivity Software',
-    'Project Management & Collaboration Tools': 'Cloud & Productivity Software',
-    'Video Conferencing Software (Zoom, Teams, Webex)': 'Cloud & Productivity Software',
-    'Workflow Automation Software': 'Cloud & Productivity Software',
-    'Agri ERP Software Implementation': 'Industry-Specific Software',
-    'Dealership Management Software': 'Industry-Specific Software',
-    'Digital Vehicle Inspection Software': 'Industry-Specific Software',
-    'Label Design Software': 'Industry-Specific Software',
-}
-
-FIX_C_PRODUCT_CATEGORY_DEST = {
-    'Augmented Reality (AR) Toys': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Baby Monitors': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Electronic Board Games': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Electronic Building Blocks': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Language Learning Devices': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Musical Toys': ('Home & Lifestyle', "Children's Play Equipment & Toys"),
-    'Box Build Assembly': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'Conformal Coating Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'High Volume PCB Assembly': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'PCB Soldering Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'Prototype PCB Assembly': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'Turnkey PCB Assembly Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'Barcode Labels For Waste Bags': ('Packaging & Printing', 'Barcode Labels & RFID Tags'),
-    'Lighting Design Consultants': ('Services & Support', 'Engineering & Technical Services'),
-    'Operator Training Programs': ('Services & Support', 'Training & Skill Development'),
-}
-
-# ============================================================
-# FIX D — Invalid software subcategory names
-# ============================================================
-FIX_D_SUBCATEGORY_RENAME = {
-    'Electronic Components': 'Industry-Specific Software',
-    'Fleet Management Solutions': 'Industry-Specific Software',
-    'Medical Consumables': 'Healthcare IT Software',
-    'Packaging Materials': 'Industry-Specific Software',
-    'Retail Point of Sale (POS) Software': 'CRM & Sales Automation Software',
-    'Healthcare IT Solutions': 'Healthcare IT Software',
-    'Embedded Systems Development': 'Industry-Specific Software',
-}
-
-# ============================================================
-# FIX SW — Move non-software subcategories out of Software
-# ============================================================
-SW_WRONG_SUBCATEGORIES = {
-    'Electronic Assembly Services': ('Electrical & Electronics', 'PCB & Electronic Components'),
-    'Computers, Laptops & Peripherals': ('Electrical & Electronics', 'Computers, Laptops & Peripherals'),
-    'Electronic Component Repair & Maintenance Services': ('Services & Support', 'IT Support & Managed Services'),
-    'Electronic Design & Prototyping Services': ('Services & Support', 'Engineering & Technical Services'),
-    'Retail Point of Sale (POS) Systems': ('Software & IT Solutions', 'CRM & Sales Automation Software'),
-    'Ambulance Fleet Management Software': ('Software & IT Solutions', 'Healthcare IT Software'),
-    'Mental Health & Wellness Applications': ('Software & IT Solutions', 'Healthcare IT Software'),
-    'Gaming Software & Platforms': ('Software & IT Solutions', 'Creative & Game Development Software'),
-    'Enterprise Resource Planning (ERP) Systems': ('Software & IT Solutions', 'ERP & Business Management Software'),
-}
-
-# ============================================================
-# FIX E — Sports construction products
-# ============================================================
-FIX_E_SPORTS_CONSTRUCTION = {
+CONSTRUCTION_ENG_REMAP = {
+    # Sports construction → Construction & Infrastructure with specific subcategory
     'Badminton Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
     'Basketball Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
     'Cricket Ground Development': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Dugout & Players\' Benches Installation': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Fencing & Boundary Netting': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
     'Football Field Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Hockey Field Installation': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
     'Indoor Sports Hall Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
-    'Swimming Pool Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
-    'Tennis Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Locker Room & Shower Facilities': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Multi-sport Arena Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Natural Grass Field Development': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Running Track Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Skating Rink Installation': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Squash Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
     'Stadium Seating Installation': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
-    'Sports Flooring Installation (Pvc, Wooden, Pu)': ('Construction & Infrastructure', 'Tiles, Marble, Granite & Flooring'),
+    'Swimming Pool Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Synthetic Turf Installation': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Tennis Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Volleyball Court Construction': ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'),
+    'Sports Flooring Installation (PVC, Wooden, PU)': ('Construction & Infrastructure', 'Tiles, Marble, Granite & Flooring'),
     'Sports Lighting Systems': ('Electrical & Electronics', 'Lighting Fixtures & Fittings'),
-    'Gym And Fitness Center Setup': ('Services & Support', 'Engineering & Technical Services'),
+    'Scoreboard & Display Installation': ('Electrical & Electronics', 'Surveillance & Security Systems'),
+    'Gym & Fitness Center Setup': ('Services & Support', 'Engineering & Technical Services'),
+    # Calibration → Services & Support
+    '3D Scanning & Reverse Engineering': ('Services & Support', 'Engineering & Technical Services'),
+    'Dimensional Calibration Services': ('Services & Support', 'Engineering & Technical Services'),
+    'Electrical Instrument Calibration Tools': ('Services & Support', 'Engineering & Technical Services'),
+    'Energy Audits & Power Quality Analysis': ('Services & Support', 'Engineering & Technical Services'),
+    'Erection Supervision': ('Services & Support', 'Engineering & Technical Services'),
+    'Flow Meter Calibration': ('Services & Support', 'Engineering & Technical Services'),
+    'Gas Detector Calibration': ('Services & Support', 'Engineering & Technical Services'),
+    'Green Building Consulting': ('Services & Support', 'Environmental Consulting & Audits'),
+    'Humidity Calibration Services': ('Services & Support', 'Engineering & Technical Services'),
+    'Maintenance Engineering Audits': ('Services & Support', 'Engineering & Technical Services'),
+    'Mass Calibration Services': ('Services & Support', 'Engineering & Technical Services'),
+    'Project Cost Estimation': ('Services & Support', 'Engineering & Technical Services'),
+    'Prototype Manufacturing Support': ('Services & Support', 'Engineering & Technical Services'),
+    'SOP & Safety Documentation Services': ('Services & Support', 'Certification & Compliance Services'),
+    'Sheet Metal Fabrication Consulting': ('Services & Support', 'Engineering & Technical Services'),
+    'Solar Power Plant Design': ('Services & Support', 'Engineering & Technical Services'),
+    'Temperature Calibration Services': ('Services & Support', 'Engineering & Technical Services'),
+    'Torque Wrench Calibration': ('Services & Support', 'Engineering & Technical Services'),
+    'Water Conservation Engineering': ('Services & Support', 'Engineering & Technical Services'),
+    'Weighing Scale Calibration': ('Services & Support', 'Engineering & Technical Services'),
 }
 
 # ============================================================
-# SPECIFIC CATEGORY/SUBCATEGORY FIXES
+# SPECIFIC FIXES
 # ============================================================
 SPECIFIC_FIXES = {
     ('Apparel & Fashion', 'Retail Point of Sale (POS) Software'): ('Software & IT Solutions', 'CRM & Sales Automation Software'),
@@ -257,6 +360,7 @@ SPECIFIC_FIXES = {
     ('Electrical & Electronics', 'Engineering & Technical Services'): ('Services & Support', 'Engineering & Technical Services'),
     ('Services & Support', 'Excess Inventory Management'): None,
     ('Agriculture & Food Products', 'Excess Inventory'): None,
+    ('Office Supplies & Equipment', 'Computer Accessories'): ('Electrical & Electronics', 'Computer Accessories'),
 }
 
 PRODUCTS_TO_DELETE = {
@@ -295,7 +399,7 @@ def run():
     if is_completed('phase5'):
         return
 
-    logger.info('Starting Phase 5 — Validator v7 (Complete)')
+    logger.info('Starting Phase 5 — Validator v8')
 
     input_path = os.path.join(PHASE4_OUTPUT_DIR, 'normalized.csv')
     if not os.path.exists(input_path):
@@ -309,22 +413,22 @@ def run():
     logger.info(f'Input rows: {initial}')
     rows_to_delete = []
 
-    # ── PRE-FIX: Rename Agriculture & Food Products → Agriculture & Farming
+    # ── Rename Agriculture & Food Products → Agriculture & Farming
     afp_mask = df['category'] == 'Agriculture & Food Products'
     df.loc[afp_mask, 'category'] = 'Agriculture & Farming'
     logger.info(f'Renamed Agriculture & Food Products → Agriculture & Farming: {afp_mask.sum()} rows')
 
-    # ── PRE-FIX 2: Delete Excess Inventory subcategory
+    # ── Delete Excess Inventory
     excess_mask = df['subcategory'] == 'Excess Inventory'
     rows_to_delete.extend(df[excess_mask].index.tolist())
     logger.info(f'Marked {excess_mask.sum()} Excess Inventory rows for deletion')
 
-    # ── ISSUE 9: Delete truncated/invalid products
+    # ── Issue 9: Delete truncated/invalid
     delete_mask = df['product_category'].isin(PRODUCTS_TO_DELETE)
     rows_to_delete.extend(df[delete_mask].index.tolist())
-    logger.info(f'Issue 9: Marked {delete_mask.sum()} truncated/invalid products for deletion')
+    logger.info(f'Issue 9: Marked {delete_mask.sum()} invalid products for deletion')
 
-    # ── ISSUE 1: Food & Beverage keyword-based split
+    # ── Issue 1: Move food products to Food & Beverage
     food_found = 0
     for idx, row in df.iterrows():
         if idx in rows_to_delete:
@@ -339,70 +443,76 @@ def run():
                 food_found += 1
     logger.info(f'Issue 1: Moved {food_found} food products to Food & Beverage')
 
-    # ── FIX A: Agriculture & Food Products leftover
-    afp_mask2 = df['category'] == 'Agriculture & Food Products'
-    for idx, row in df[afp_mask2].iterrows():
-        dest = FIX_A_REMAP.get(row['subcategory'])
-        if dest is None:
-            rows_to_delete.append(idx)
-        else:
-            df.at[idx, 'category'] = dest[0]
-            df.at[idx, 'subcategory'] = dest[1]
+    # ── Fix 1: Move food subcategories from Agriculture & Farming to Food & Beverage
+    agri_food_mask = (
+        (df['category'] == 'Agriculture & Farming') &
+        (df['subcategory'].isin(FOOD_SUBCATEGORIES_IN_AGRI))
+    )
+    agri_food_count = agri_food_mask.sum()
+    if agri_food_count:
+        df.loc[agri_food_mask, 'category'] = 'Food & Beverage'
+        logger.info(f'Fix 1: Moved {agri_food_count} food subcategory products from Agriculture to Food & Beverage')
 
-    # ── FIX B: Remove Energy & Power
-    energy_mask = df['category'] == 'Energy & Power'
-    for idx, row in df[energy_mask].iterrows():
-        new_cat, new_sub = FIX_B_ENERGY_REMAP.get(
-            row['product_category'], ('Electrical & Electronics', 'Renewable Energy Equipment'))
-        df.at[idx, 'category'] = new_cat
-        df.at[idx, 'subcategory'] = new_sub
-    logger.info(f'Fix B: Energy & Power eliminated ({energy_mask.sum()} products remapped)')
-
-    # ── FIX C: ERP overload reclassification
-    erp_mask = ((df['category'] == 'Software & IT Solutions') &
-                (df['subcategory'] == 'ERP & Business Management Software'))
-    erp_reclassified = 0
-    for idx, row in df[erp_mask].iterrows():
+    # ── Fix 2: Garment Manufacturing (OEM/ODM) → correct apparel subcategories
+    gm_mask = df['subcategory'] == 'Garment Manufacturing (OEM/ODM)'
+    gm_fixed = 0
+    for idx, row in df[gm_mask].iterrows():
         prod = row['product_category']
-        if prod in FIX_C_PRODUCT_SUBCATEGORY:
-            df.at[idx, 'subcategory'] = FIX_C_PRODUCT_SUBCATEGORY[prod]
-            erp_reclassified += 1
-        elif prod in FIX_C_PRODUCT_CATEGORY_DEST:
-            new_cat, new_sub = FIX_C_PRODUCT_CATEGORY_DEST[prod]
-            df.at[idx, 'category'] = new_cat
-            df.at[idx, 'subcategory'] = new_sub
-            erp_reclassified += 1
-    logger.info(f'Fix C: ERP reclassification — {erp_reclassified} products moved')
-
-    # ── FIX D: Rename invalid software subcategories
-    sw_mask = df['category'] == 'Software & IT Solutions'
-    for idx, row in df[sw_mask].iterrows():
-        if row['subcategory'] in FIX_D_SUBCATEGORY_RENAME:
-            df.at[idx, 'subcategory'] = FIX_D_SUBCATEGORY_RENAME[row['subcategory']]
-    logger.info('Fix D: Invalid software subcategory names corrected')
-
-    # ── FIX SW: Move non-software subcategories out of Software
-    sw_fix_count = 0
-    for idx, row in df[df['category'] == 'Software & IT Solutions'].iterrows():
-        if row['subcategory'] in SW_WRONG_SUBCATEGORIES:
-            new_cat, new_sub = SW_WRONG_SUBCATEGORIES[row['subcategory']]
-            df.at[idx, 'category'] = new_cat
-            df.at[idx, 'subcategory'] = new_sub
-            sw_fix_count += 1
-    logger.info(f'Fix SW: {sw_fix_count} products moved out of wrong Software subcategories')
-
-    # ── FIX E: Sports construction products
-    sports_eng_mask = ((df['category'] == 'Sports & Entertainment') &
-                       (df['subcategory'] == 'Engineering & Technical Services'))
-    for idx, row in df[sports_eng_mask].iterrows():
-        new_cat, new_sub = FIX_E_SPORTS_CONSTRUCTION.get(
-            row['product_category'],
-            ('Construction & Infrastructure', 'Sports & Recreational Infrastructure'))
-        df.at[idx, 'category'] = new_cat
+        new_sub = GARMENT_OEM_REMAP.get(prod, "Men's Wear")
         df.at[idx, 'subcategory'] = new_sub
-    logger.info(f'Fix E: {sports_eng_mask.sum()} sports construction products moved')
+        gm_fixed += 1
+    logger.info(f'Fix 2: Garment Manufacturing (OEM/ODM) — {gm_fixed} products remapped')
 
-    # ── SPECIFIC FIXES (issues 3-8)
+    # ── Fix 3: Industry-Specific Software reclassification
+    iss_mask = (
+        (df['category'] == 'Software & IT Solutions') &
+        (df['subcategory'] == 'Industry-Specific Software')
+    )
+    iss_fixed = 0
+    for idx, row in df[iss_mask].iterrows():
+        prod = row['product_category']
+        if prod in ISS_HEALTHCARE:
+            df.at[idx, 'subcategory'] = 'Healthcare IT Software'
+            iss_fixed += 1
+        elif prod in ISS_IOT:
+            df.at[idx, 'subcategory'] = 'IoT & Smart Building Software'
+            iss_fixed += 1
+        elif prod in ISS_CRM:
+            df.at[idx, 'subcategory'] = 'CRM & Sales Automation Software'
+            iss_fixed += 1
+        elif prod in ISS_HR:
+            df.at[idx, 'subcategory'] = 'HR & Payroll Software'
+            iss_fixed += 1
+        elif prod in ISS_CLOUD:
+            df.at[idx, 'subcategory'] = 'Cloud & Productivity Software'
+            iss_fixed += 1
+        elif prod in ISS_CREATIVE:
+            df.at[idx, 'subcategory'] = 'Creative & Game Development Software'
+            iss_fixed += 1
+        elif prod in ISS_FLEET:
+            df.at[idx, 'subcategory'] = 'Fleet & Vehicle Management Software'
+            iss_fixed += 1
+        elif prod in ISS_APPAREL_SW:
+            df.at[idx, 'subcategory'] = ISS_APPAREL_SW[prod]
+            iss_fixed += 1
+    logger.info(f'Fix 3: Industry-Specific Software reclassified — {iss_fixed} products moved')
+
+    # ── Fix 4: Construction Engineering remap
+    const_eng_mask = (
+        (df['category'] == 'Construction & Infrastructure') &
+        (df['subcategory'] == 'Engineering & Technical Services')
+    )
+    const_eng_fixed = 0
+    for idx, row in df[const_eng_mask].iterrows():
+        prod = row['product_category']
+        if prod in CONSTRUCTION_ENG_REMAP:
+            new_cat, new_sub = CONSTRUCTION_ENG_REMAP[prod]
+            df.at[idx, 'category'] = new_cat
+            df.at[idx, 'subcategory'] = new_sub
+            const_eng_fixed += 1
+    logger.info(f'Fix 4: Construction Engineering remapped — {const_eng_fixed} products')
+
+    # ── Specific fixes
     specific_fixed = 0
     specific_deleted = 0
     for idx, row in df.iterrows():
@@ -420,27 +530,23 @@ def run():
                 specific_fixed += 1
     logger.info(f'Specific fixes: {specific_fixed} fixed, {specific_deleted} deleted')
 
-    # ── ISSUE 2: Industrial Tools split
+    # ── Industrial Tools split
     it_mask = ((df['category'] == 'Machinery & Equipment') &
                (df['subcategory'] == 'Industrial Tools'))
     it_packaging_kw = ['shrink wrap', 'packing machine', 'filling machine', 'sealing machine',
         'labeling machine', 'cartoning', 'form fill seal', 'wrapping machine', 'packaging line',
         'case packer', 'coding machine', 'flow wrap', 'sleeve wrap', 'auger fill',
-        'bag in box', 'pouch packing', 'sachet pack', 'induction seal', 'carton sealer',
-        'foil wrap machine', 'vacuum packing', 'multi-lane pack', 'heat sealing machine']
+        'bag in box', 'carton sealer', 'heat sealing machine', 'induction seal']
     it_metal_kw = ['scrap metal', 'metal scrap', 'steel scrap', 'copper scrap', 'aluminum scrap',
         'iron scrap', 'metal coil', 'metal rod', 'stainless steel sheet', 'metal plate',
-        'steel plate', 'aluminum plate', 'metal foil', 'metal baling', 'ferrous scrap',
-        'non-ferrous scrap', 'metal turnings', 'cast iron scrap']
+        'metal foil', 'metal baling', 'ferrous scrap', 'non-ferrous scrap']
     it_cold_kw = ['cold room', 'cold storage unit', 'refrigerated van', 'reefer container',
-        'portable cold box', 'insulated delivery box', 'condensing unit']
+        'portable cold box', 'condensing unit']
     it_stage_kw = ['stage platform', 'stage riser', 'stage truss', 'dj booth', 'pipe and drape',
-        'backdrop frame', 'stage canopy', 'stage curtain', 'portable stage', 'studio furniture']
-    it_farm_kw = ['seed dibbler', 'seed grader', 'direct seeder', 'soil auger', 'nursery seedling',
-        'agricultural crate', 'farm trailer', 'fertilizer spreader', 'transplanter', 'brush cutter',
-        'polyhouse', 'venturi injector']
-    it_apparel_kw = ['garment sample', 'apparel cad', 'fit sample', 'fabric swatch',
-        'embroidery sample', 'pre-production sample', 'pattern testing', 'colorway sample']
+        'backdrop frame', 'stage canopy', 'stage curtain', 'portable stage']
+    it_farm_kw = ['seed dibbler', 'seed grader', 'direct seeder', 'soil auger',
+        'agricultural crate', 'farm trailer', 'fertilizer spreader', 'transplanter',
+        'brush cutter', 'polyhouse', 'venturi injector']
     it_reclassified = 0
     for idx, row in df[it_mask].iterrows():
         prod = row['product_category'].lower()
@@ -461,113 +567,13 @@ def run():
         elif any(kw in prod for kw in it_farm_kw):
             df.at[idx, 'subcategory'] = 'Agricultural Machinery'
             it_reclassified += 1
-        elif any(kw in prod for kw in it_apparel_kw):
-            df.at[idx, 'category'] = 'Apparel & Fashion'
-            df.at[idx, 'subcategory'] = 'Garment Accessories & Trims'
-            it_reclassified += 1
-    logger.info(f'Issue 2: Industrial Tools split — {it_reclassified} products reclassified')
+    logger.info(f'Industrial Tools split — {it_reclassified} products reclassified')
 
-    # ── ERP keyword reclassification
-    erp_mask2 = ((df['category'] == 'Software & IT Solutions') &
-                 (df['subcategory'] == 'ERP & Business Management Software'))
-    iot_kw = ['air quality monitor', 'app-based monitoring', 'battery management system',
-        'building management system', 'cloud-based smart building', 'cold chain temperature',
-        'data logger', 'iot gateway', 'iot solutions for smart', 'iot-based cold',
-        'iot-enabled', 'leak detection', 'motorized curtain', 'occupancy sensor',
-        'power factor correction', 'remote lock', 'scada', 'smart building mobile',
-        'smart cctv', 'smart grid', 'smart lighting control', 'smart meter',
-        'smart video door', 'wi-fi & bluetooth smart', 'wireless control system', 'zigbee',
-        'hvac automation', 'integrated facility dashboard']
-    crm_kw = ['crm & sales', 'customer relationship management', 'crm software',
-        'email marketing', 'helpdesk & support ticketing', 'loyalty program integrated pos',
-        'marketplace order sync', 'mobile pos apps', 'pos integration for fashion',
-        'pos with whatsapp', 'point of sale', 'return & exchange management',
-        'saas subscription pos', 'sales analytics', 'cloud-based fashion pos', 'custom fashion pos']
-    hr_kw = ['attendance & hrms', 'biometric attendance', 'hr & payroll management',
-        'hrms & payroll', 'human resource management systems', 'payroll software',
-        'time & attendance management']
-    health_kw = ['cloud-based medical transcription', 'diagnostic software & scanner',
-        'hospital information management', 'medical billing software', 'medical vr equipment',
-        'healthcare startup']
-    industry_kw = ['adulteration detection', 'agri erp software', 'allergen testing',
-        'automated optical inspection', 'cnc cutting software', 'chemical process control',
-        'crop protection monitoring', 'dealership management', 'digital vehicle inspection',
-        'export documentation & compliance', 'fssai compliance', 'face recognition access',
-        'farm automation', 'hmi control', 'halal, kosher testing', 'heavy metal analysis',
-        'iso 22000', 'label claim validation', 'label design software',
-        'microbiological testing', 'nutritional analysis', 'organic certification testing',
-        'plc integrated', 'shelf life & stability', 'tech pack to sample',
-        'ux/ui design for infotainment', 'vibration monitoring for bearings',
-        'waste tracking logs', 'water quality testing for food', 'cad & 3d design software']
-    cloud_kw = ['accounting & billing software', 'accounting & bookkeeping saas',
-        'accounting software (tally', 'agile & scrum', 'api development & integration',
-        'automated billing & invoicing', 'cloud storage', 'compliance checklist',
-        'desktop application development', 'developer tools',
-        'document management & e-signature', 'electronic signature software',
-        'encrypted file transmission', 'hybrid event solutions', 'id card design software',
-        'laptop & desktop leasing', 'network & it tool', 'office productivity software',
-        'operating system licenses', 'post-implementation support', 'project management',
-        'saas product development', 'secure document sharing',
-        'smartwatch app development', 'software development consulting',
-        'software maintenance & support', 'speech recognition ai',
-        'task management & reminder', 'video conferencing software', 'virtual classrooms',
-        'virtual event management', 'virtual group classes', 'voice recognition toys',
-        'web application development', 'website & landing page', 'workflow automation']
-    creative_kw = ['ar game development', 'ar/vr multiplayer', 'custom vr environment',
-        'dj software', 'enterprise vr platform', 'music production software',
-        'online gaming subscription', 'retail & e-commerce vr', 'streaming software license',
-        'vr app development', 'vr content creation', 'vr data analytics',
-        'vr development boards', 'vr game title', 'vr integration services',
-        'vr streaming', 'vr in real estate', 'virtual esports', 'virtual reality fitness',
-        'virtual reality for education']
-    toys_kw = ['augmented reality (ar) toy', 'baby monitor', 'digital flashcard',
-        'electronic board game', 'electronic building block', 'electronic drawing pad',
-        'language learning device', 'musical toy', 'remote-controlled educational',
-        'sound and light toy']
-    pcb_kw = ['box build assembly', 'conformal coating service', 'custom electronic assembly',
-        'high volume pcb', 'mixed technology assembly', 'pcb soldering', 'pcba testing',
-        'prototype pcb', 'reflow soldering', 'surface mount technology',
-        'through-hole assembly', 'turnkey pcb', 'wave soldering', 'x-ray inspection for pcb']
-
-    erp_reclassified2 = 0
-    for idx, row in df[erp_mask2].iterrows():
-        prod = row['product_category'].lower()
-        if any(kw in prod for kw in iot_kw):
-            df.at[idx, 'subcategory'] = 'IoT & Smart Building Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in crm_kw):
-            df.at[idx, 'subcategory'] = 'CRM & Sales Automation Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in hr_kw):
-            df.at[idx, 'subcategory'] = 'HR & Payroll Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in health_kw):
-            df.at[idx, 'subcategory'] = 'Healthcare IT Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in industry_kw):
-            df.at[idx, 'subcategory'] = 'Industry-Specific Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in cloud_kw):
-            df.at[idx, 'subcategory'] = 'Cloud & Productivity Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in creative_kw):
-            df.at[idx, 'subcategory'] = 'Creative & Game Development Software'
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in toys_kw):
-            df.at[idx, 'category'] = 'Home & Lifestyle'
-            df.at[idx, 'subcategory'] = "Children's Play Equipment & Toys"
-            erp_reclassified2 += 1
-        elif any(kw in prod for kw in pcb_kw):
-            df.at[idx, 'category'] = 'Electrical & Electronics'
-            df.at[idx, 'subcategory'] = 'PCB & Electronic Components'
-            erp_reclassified2 += 1
-    logger.info(f'ERP keyword reclassification: {erp_reclassified2} products moved')
-
-    # ── APPLY DELETIONS
+    # ── Apply deletions
     df = df.drop(index=list(set(rows_to_delete)))
     logger.info(f'Total rows deleted: {len(set(rows_to_delete))}')
 
-    # ── SOFTWARE MISPLACEMENT
+    # ── Software misplacement
     misplaced_mask = df.apply(
         lambda row: row['category'] in NON_SOFTWARE_CATEGORIES
                     and is_software(str(row['product_category'])), axis=1)
@@ -576,7 +582,7 @@ def run():
         df.loc[misplaced_mask, 'category'] = 'Software & IT Solutions'
         df.loc[misplaced_mask, 'subcategory'] = 'Industry-Specific Software'
 
-    # ── DEDUPLICATION
+    # ── Deduplication
     before = len(df)
     df = df.drop_duplicates()
     logger.info(f'Exact duplicates removed: {before - len(df)}')
@@ -594,32 +600,37 @@ def run():
     df = df.drop(columns=['_lower'])
     logger.info(f'Case duplicates resolved: {before - len(df)}')
 
-    # ── DROP EMPTY
+    # ── Drop empty
     df = df.dropna(subset=['category', 'subcategory', 'product_category'])
     df = df[df['product_category'].str.strip() != '']
 
-    # ── SORT
+    # ── Sort
     df = df.sort_values(['category', 'subcategory', 'product_category']).reset_index(drop=True)
 
     final = len(df)
     cat_count = df['category'].nunique()
     sub_count = df['subcategory'].nunique()
 
-    # ── VALIDATION REPORT
+    # ── Validation report
     food_bev = len(df[df['category'] == 'Food & Beverage'])
     agri = len(df[df['category'] == 'Agriculture & Farming'])
     it_remaining = len(df[(df['category'] == 'Machinery & Equipment') &
                           (df['subcategory'] == 'Industrial Tools')])
-    hc_it_wrong = len(df[df['subcategory'] == 'Healthcare IT Solutions'])
-    excess = len(df[df['subcategory'] == 'Excess Inventory'])
+    gm_remaining = len(df[df['subcategory'] == 'Garment Manufacturing (OEM/ODM)'])
+    food_in_agri = len(df[(df['category'] == 'Agriculture & Farming') &
+                           (df['subcategory'].isin(FOOD_SUBCATEGORIES_IN_AGRI))])
     sw_subs = df[df['category'] == 'Software & IT Solutions']['subcategory'].value_counts()
+    iss_remaining = len(df[(df['category'] == 'Software & IT Solutions') &
+                            (df['subcategory'] == 'Industry-Specific Software')])
 
     logger.info(f'\n{"="*55}')
     logger.info('VALIDATION RESULTS:')
-    logger.info(f'  Issue 1 — Food & Beverage: {food_bev} products (target: 200+)')
-    logger.info(f'  Issue 2 — Industrial Tools remaining: {it_remaining} (was 461)')
-    logger.info(f'  Issue 3 — Healthcare IT Solutions wrong cats: {hc_it_wrong} (target: 0)')
-    logger.info(f'  Issue 6 — Excess Inventory subcategory: {excess} (target: 0)')
+    logger.info(f'  Fix 1 — Food subcats in Agriculture & Farming: {food_in_agri} (target: 0)')
+    logger.info(f'  Fix 2 — Garment Manufacturing (OEM/ODM) remaining: {gm_remaining} (target: 0)')
+    logger.info(f'  Fix 3 — Industry-Specific Software remaining: {iss_remaining} (target: <50)')
+    logger.info(f'  Fix 4 — Industrial Tools remaining: {it_remaining} (was 461)')
+    logger.info(f'  Food & Beverage: {food_bev} products')
+    logger.info(f'  Agriculture & Farming: {agri} products')
     logger.info(f'{"="*55}')
     logger.info(f'\nSoftware subcategories:\n{sw_subs.to_string()}')
     logger.info(f'\nCategory distribution:\n{df["category"].value_counts().to_string()}')
@@ -630,6 +641,8 @@ def run():
     set_metric('food_beverage_products', food_bev)
     set_metric('agriculture_farming_products', agri)
     set_metric('industrial_tools_remaining', it_remaining)
+    set_metric('garment_oem_remaining', gm_remaining)
+    set_metric('iss_remaining', iss_remaining)
 
     output_path = os.path.join(PHASE5_OUTPUT_DIR, 'final_taxonomy.csv')
     df.to_csv(output_path, index=False, encoding='utf-8')
