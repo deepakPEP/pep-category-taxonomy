@@ -713,7 +713,8 @@ def fix_row(row) -> dict:
     return {'category': cat, 'subcategory': sub, 'product_category': prod}
 
 
-def collapse_thin_subcategories(df: pd.DataFrame, min_products: int = 5) -> pd.DataFrame:
+
+def collapse_thin_subcategories(df: pd.DataFrame, min_products: int = 8) -> pd.DataFrame:
     """
     Collapse subcategories with fewer than min_products into the most populated
     sibling subcategory within the same category.
@@ -816,7 +817,12 @@ def run():
     logger.info(f"Sports & Entertainment: {sports_count} products")
 
     # Collapse thin subcategories (< 5 products each)
-    df = collapse_thin_subcategories(df, min_products=5)
+    df = collapse_thin_subcategories(df, min_products=8)
+    
+    # Remove exact duplicates again after collapse
+    df = df.drop_duplicates(subset=['category', 'subcategory', 'product_category'])
+    
+    # Collapse thin subcategories (< 5 products each)
     
     # Remove exact duplicates again after collapse
     df = df.drop_duplicates(subset=['category', 'subcategory', 'product_category'])
