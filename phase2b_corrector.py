@@ -712,6 +712,49 @@ def fix_row(row) -> dict:
 
     return {'category': cat, 'subcategory': sub, 'product_category': prod}
 
+
+def collapse_thin_subcategories(df: pd.DataFrame, min_products: int = 5) -> pd.DataFrame:
+    """
+    Collapse subcategories with fewer than min_products into the most populated
+    sibling subcategory within the same category.
+    Target: max 60 subcategories per category, min 5 products per subcategory.
+    """
+    logger.info(f"Collapsing subcategories with < {min_products} products...")
+    
+    iterations = 0
+    while iterations < 5:  # max 5 passes to handle chains
+        iterations += 1
+        sub_counts = df.groupby(['category', 'subcategory']).size().reset_index(name='count')
+        thin = sub_counts[sub_counts['count'] < min_products]
+        
+        if thin.empty:
+            break
+            
+        logger.info(f"  Pass {iterations}: {len(thin)} thin subcategories to collapse")
+        
+        for _, row in thin.iterrows():
+            cat = row['category']
+            sub = row['subcategory']
+            
+            # Find most populated sibling in same category
+            siblings = df[
+                (df['category'] == cat) &
+                (df['subcategory'] != sub)
+            ]['subcategory'].value_counts()
+            
+            if siblings.empty:
+                continue
+                
+            best_sibling = siblings.index[0]
+            df.loc[
+                (df['category'] == cat) & (df['subcategory'] == sub),
+                'subcategory'
+            ] = best_sibling
+    
+    final_sub_count = df['subcategory'].nunique()
+    logger.info(f"Subcategory collapse complete: {final_sub_count} subcategories remain")
+    return df
+
 def run():
     if is_completed("phase2b"):
         return
@@ -772,6 +815,12 @@ def run():
     sports_count = len(df[df['category'] == 'Sports & Entertainment'])
     logger.info(f"Sports & Entertainment: {sports_count} products")
 
+    # Collapse thin subcategories (< 5 products each)
+    df = collapse_thin_subcategories(df, min_products=5)
+    
+    # Remove exact duplicates again after collapse
+    df = df.drop_duplicates(subset=['category', 'subcategory', 'product_category'])
+    
     df.to_csv(input_path, index=False, encoding='utf-8')
     corrected = os.path.join(PHASE2_OUTPUT_DIR, "corrected_taxonomy.csv")
     df.to_csv(corrected, index=False, encoding='utf-8')
